@@ -49,7 +49,6 @@ const ProjectPanel = ({
   cameraZ = 0,
   initialized = () => {}
 }) => {
-  const { viewport } = useThree();
   const distanceFromCurrent = Math.abs(index - currentProjectIndex);
   const isFocused = currentProjectIndex === index;
 
@@ -59,7 +58,7 @@ const ProjectPanel = ({
   const { position } = useSpring({
     position: [
       isFocused ? 0 : currentProjectIndex < index ? baseX : -10,
-      0.5,
+      0.4,
       isFocused ? cameraZ - 6 : currentProjectIndex < index ? baseZ : 0
     ],
     config: {
@@ -97,8 +96,6 @@ const ProjectPanel = ({
           disabled={index !== currentProjectIndex}
         />
       </Flex>
-
-      <transitionMaterial transparent intensity={0.7} progress={1.0} direction={1.0} />
     </animated.group>
   );
 };
@@ -200,7 +197,8 @@ const UnifiedProjectCarousel = ({ projects }) => {
           />
         ))}
 
-        <mesh position={[0, -0.4, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        {/* Adjusted reflective floor position to be lower */}
+        <mesh position={[0, -0.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[50, 50]} />
           <MeshReflectorMaterial
             blur={[300, 100]}

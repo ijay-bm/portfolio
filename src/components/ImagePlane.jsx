@@ -178,16 +178,43 @@ const ImagePlane = ({
     };
   }, [autoPlay, autoPlayInterval, isInitialized]);
 
+  // Updated calculateImageScale to handle various aspect ratios
   const calculateImageScale = (texture) => {
     const imageAspect = texture.image.width / texture.image.height;
-    // const viewportAspect = size.width / size.height;
+    const targetAspect = 16 / 9; // Target aspect ratio (16:9)
 
-    // if (viewportAspect > imageAspect) {
-    //   scaleX = scaleY * imageAspect;
-    // } else {
-    scaleY = scaleX / imageAspect;
-    // }
-    return { x: scaleX, y: scaleY };
+    // Set a fixed width for consistency
+    const fixedWidth = scaleX;
+
+    // Calculate height based on image aspect ratio
+    let calculatedHeight = fixedWidth / imageAspect;
+
+    // For portrait images (phone screenshots, etc)
+    if (imageAspect < 1) {
+      // Cap the height and adjust width to maintain aspect ratio
+      const maxHeight = fixedWidth * 0.8; // Cap height at 80% of width
+
+      if (calculatedHeight > maxHeight) {
+        calculatedHeight = maxHeight;
+        const cappedWidth = calculatedHeight * imageAspect;
+        return { x: cappedWidth, y: calculatedHeight };
+      }
+    }
+
+    // For landscape images that aren't 16:9
+    // If image is taller than 16:9 would be at this width
+    if (imageAspect < targetAspect) {
+      // Allow some flexibility, but ensure it's not too tall
+      const maxHeight = (fixedWidth / targetAspect) * 1.2;
+
+      if (calculatedHeight > maxHeight) {
+        calculatedHeight = maxHeight;
+        const cappedWidth = calculatedHeight * imageAspect;
+        return { x: cappedWidth, y: calculatedHeight };
+      }
+    }
+
+    return { x: fixedWidth, y: calculatedHeight };
   };
 
   // Load textures
