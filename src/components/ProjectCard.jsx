@@ -1,7 +1,7 @@
 import { animated, useSpring } from "@react-spring/three";
 import { Text, useCursor } from "@react-three/drei";
 import { Box, Flex } from "@react-three/flex";
-import React, { useState } from "react";
+import { useState } from "react";
 
 const ButtonMesh = ({ text, onClick, disabled }) => {
   const [hovered, setHovered] = useState(false);
@@ -186,4 +186,5 @@ const ProjectCard = ({ project, position = [0, 0, 0], disabled = false }) => {
     </Box>
   );
 };
+
 export default ProjectCard;
