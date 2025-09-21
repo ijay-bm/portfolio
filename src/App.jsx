@@ -48,23 +48,72 @@ import xcursionM from "./assets/images/xcursion/xcursion-m.webp";
 import xcursionN from "./assets/images/xcursion/xcursion-n.webp";
 import xcursionO from "./assets/images/xcursion/xcursion-o.webp";
 
+import soloAlertA from "./assets/images/solo-alert/solo-alert-a.webp";
+import soloAlertB from "./assets/images/solo-alert/solo-alert-b.webp";
+import soloAlertC from "./assets/images/solo-alert/solo-alert-c.webp";
+import soloAlertD from "./assets/images/solo-alert/solo-alert-d.webp";
+// import soloAlertE from "./assets/images/solo-alert/solo-alert-e.webp";
+
 import soloAlertApiA from "./assets/images/solo-alert/solo-alert-api-a.webp";
 import soloAlertApiB from "./assets/images/solo-alert/solo-alert-api-b.webp";
 import soloAlertApiC from "./assets/images/solo-alert/solo-alert-api-c.webp";
 import soloAlertCheckInsOnlyEr from "./assets/images/solo-alert/solo-alert-check-ins-only-er.webp";
 import soloAlertCmsA from "./assets/images/solo-alert/solo-alert-cms-a.webp";
-import soloAlertIosA from "./assets/images/solo-alert/solo-alert-ios-a.webp";
-import soloAlertIosB from "./assets/images/solo-alert/solo-alert-ios-b.webp";
-import soloAlertIosC from "./assets/images/solo-alert/solo-alert-ios-c.webp";
-import soloAlertIosD from "./assets/images/solo-alert/solo-alert-ios-d.webp";
-import soloAlertIosE from "./assets/images/solo-alert/solo-alert-ios-e.webp";
+
+import lifestylerA from "./assets/images/lifestyler/lifestyler-a.webp";
+import lifestylerB from "./assets/images/lifestyler/lifestyler-b.webp";
+import lifestylerC from "./assets/images/lifestyler/lifestyler-c.webp";
+import lifestylerD from "./assets/images/lifestyler/lifestyler-d.webp";
+import lifestylerE from "./assets/images/lifestyler/lifestyler-e.webp";
+import lifestylerF from "./assets/images/lifestyler/lifestyler-f.webp";
+import lifestylerG from "./assets/images/lifestyler/lifestyler-g.webp";
+import lifestylerH from "./assets/images/lifestyler/lifestyler-h.webp";
+import lifestylerI from "./assets/images/lifestyler/lifestyler-i.webp";
+import lifestylerJ from "./assets/images/lifestyler/lifestyler-j.webp";
+import lifestylerK from "./assets/images/lifestyler/lifestyler-k.webp";
+import lifestylerL from "./assets/images/lifestyler/lifestyler-l.webp";
+import lifestylerM from "./assets/images/lifestyler/lifestyler-m.webp";
+
+import blendedServicesA from "./assets/images/blended-services/blended-services-a.webp";
+import blendedServicesB from "./assets/images/blended-services/blended-services-b.webp";
 
 import UnifiedProjectCarousel from "./components/UnifiedProjectCarousel";
 
 const projects = [
   {
+    title: "Blended Services",
+    subtitle: "Aug 2025 - Sept 2025",
+    descriptions: ["A web app for logging the states of plants and trees"],
+    roles: ["Backend Developer", "Supported Development of new features", "Co-contributor"],
+    imageUrls: [blendedServicesA, blendedServicesB],
+    link: "https://www.btree.com.au/"
+  },
+  {
+    title: "LifeStyler",
+    subtitle: "Q2 2025 - Present",
+    descriptions: [
+      "A Job Matching platform where Job Seekers and Employers find each other through a matching algorithm."
+    ],
+    roles: ["Backend Developer", "Proprietary Framework Implementation", "Co-contributor"],
+    imageUrls: [
+      lifestylerA,
+      lifestylerB,
+      lifestylerC,
+      lifestylerD,
+      lifestylerE,
+      lifestylerF,
+      lifestylerG,
+      lifestylerH,
+      lifestylerI,
+      lifestylerJ,
+      lifestylerK,
+      lifestylerL,
+      lifestylerM
+    ]
+  },
+  {
     title: "Solo Alert",
-    subtitle: "Q1 2025 - Present",
+    subtitle: "Apr 2025 - Aug 2025",
     descriptions: [
       "A safety check-in application that allows soloists to create scheduled alerts and notify their safety circle if they fail to check in.",
       "Features include customizable check-in schedules, emergency contacts management, and location sharing with trusted individuals during emergencies."
@@ -75,16 +124,17 @@ const projects = [
       "Co-contributor"
     ],
     imageUrls: [
+      soloAlertA,
+      soloAlertB,
+      soloAlertC,
+      soloAlertD,
+      // soloAlertE,
+
       soloAlertCheckInsOnlyEr,
       soloAlertCmsA,
       soloAlertApiA,
       soloAlertApiB,
-      soloAlertApiC,
-      soloAlertIosA,
-      soloAlertIosB,
-      soloAlertIosC,
-      soloAlertIosD,
-      soloAlertIosE
+      soloAlertApiC
     ],
     link: "https://solo-alert.com/"
   },

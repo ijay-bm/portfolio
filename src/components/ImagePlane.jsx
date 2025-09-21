@@ -226,6 +226,10 @@ const ImagePlane = ({
       setDispTexture(loadedDisp);
     });
 
+    if (!imageUrls.length) {
+      return;
+    }
+
     // Load image textures
     Promise.all(
       imageUrls.map(

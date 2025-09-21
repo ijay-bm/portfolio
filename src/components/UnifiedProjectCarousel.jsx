@@ -3,7 +3,7 @@ import { Environment, MeshReflectorMaterial } from "@react-three/drei";
 import { Canvas, extend, useThree } from "@react-three/fiber";
 import { Flex } from "@react-three/flex";
 import { geometry } from "maath";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import ImagePlane from "./ImagePlane";
 import NextButton from "./NextButton";
 import PreviousButton from "./PreviousButton";
@@ -70,13 +70,22 @@ const ProjectPanel = ({
     }
   });
 
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (!project.imageUrls?.length && !hasInitialized.current) {
+      hasInitialized.current = true;
+      initialized();
+    }
+  }, []);
+
   return (
     <animated.group position={position}>
       <Flex
         justifyContent="center"
         alignItems="center"
-        flexDirection="row-reverse"
         width={5}
+        flexDirection="row-reverse"
         centerAnchor
       >
         {project.imageUrls?.length && (
@@ -106,7 +115,10 @@ const UnifiedProjectCarousel = ({ projects }) => {
   const cameraZ = 6;
   const { width, height } = useResize();
 
-  const hasFullyInitialized = initializations === projects.length - 1;
+  console.log("initializations: ", initializations);
+  console.log("projects.length - 1: ", projects.length);
+  const hasFullyInitialized = initializations === projects.length;
+  // const hasFullyInitialized = true;
 
   const handlePrevious = () => {
     setCurrentProjectIndex((prev) => (prev - 1 + projects.length) % projects.length);
