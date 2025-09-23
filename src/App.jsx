@@ -82,19 +82,24 @@ import UnifiedProjectCarousel from "./components/UnifiedProjectCarousel";
 const projects = [
   {
     title: "Blended Services",
-    subtitle: "Aug 2025 - Sept 2025",
+    subtitle: "Aug 2025 - Sep 2025",
     descriptions: ["A web app for logging the states of plants and trees"],
-    roles: ["Backend Developer", "Supported Development of new features", "Co-contributor"],
+    roles: [
+      "Backend Developer",
+      "Supported Development of new features",
+      "Proprietary Framework, Laravel",
+      "Minor contributor"
+    ],
     imageUrls: [blendedServicesA, blendedServicesB],
     link: "https://www.btree.com.au/"
   },
   {
     title: "LifeStyler",
-    subtitle: "Q2 2025 - Present",
+    subtitle: "Jun 2025 - Sep 2025",
     descriptions: [
       "A Job Matching platform where Job Seekers and Employers find each other through a matching algorithm."
     ],
-    roles: ["Backend Developer", "Proprietary Framework Implementation", "Co-contributor"],
+    roles: ["Backend Developer", "Proprietary Framework, Laravel", "Co-contributor"],
     imageUrls: [
       lifestylerA,
       lifestylerB,
@@ -120,7 +125,7 @@ const projects = [
     ],
     roles: [
       "Full Stack (Primarily Backend) Developer",
-      "Proprietary Framework Implementation",
+      "Proprietary Framework, Laravel",
       "Co-contributor"
     ],
     imageUrls: [
@@ -129,7 +134,6 @@ const projects = [
       soloAlertC,
       soloAlertD,
       // soloAlertE,
-
       soloAlertCheckInsOnlyEr,
       soloAlertCmsA,
       soloAlertApiA,
@@ -140,15 +144,15 @@ const projects = [
   },
   {
     title: "Xcursion",
-    subtitle: "Q4 2024 - Q1 2025",
-
+    subtitle: "Dec 2024 - Apr 2025",
     descriptions: [
       "A risk management tool for schools used in assessing and mitigating risks in educational programs and excursions.",
       "Implemented responsive UI components and integrated backend APIs for this Vue.js-based application"
     ],
     roles: [
       "Frontend Developer (Figma Implementation)",
-      "Vue.js/Vuetify Development",
+      // "Proprietary Framework, Nuxt, Vuetify, Vue, Tailwind",
+      "Proprietary Framework, Vue",
       "Co-contributor"
     ],
     imageUrls: [
@@ -174,7 +178,7 @@ const projects = [
     title: "Chalkboard Aral",
     subtitle: "Q3 2024",
     descriptions: ["A landing page and information hub for all of Chalkboard's ARAL initiatives."],
-    roles: ["Minor Contributor", "AWS Infrastructure Maintainer"],
+    roles: ["AWS Infrastructure Maintainer", "Minor Contributor"],
     imageUrls: [
       chalkboardAralA,
       chalkboardAralB,
@@ -191,7 +195,12 @@ const projects = [
       "A QR code-based Attendance Monitoring System (AMS) for real-time token-based attendance tracking.",
       "Utilizes handshakes between an overseer and a tutor to monitor attendance."
     ],
-    roles: ["Full Stack Developer", "AWS Infrastructure Architect", "Sole Contributor"],
+    roles: [
+      "Full Stack Developer",
+      "AWS Infrastructure Architect",
+      "Laravel, Vue",
+      "Sole Contributor"
+    ],
     imageUrls: [
       chalkboardAralAmsA,
       chalkboardAralAmsB,
@@ -207,7 +216,13 @@ const projects = [
     descriptions: [
       "An online tutoring platform where learners and tutors can meet. A marketplace where tutors personalize your learning experience."
     ],
-    roles: ["Full Stack Developer", "Deployments", "Features Development", "Co-contributor"],
+    roles: [
+      "Full Stack Developer",
+      "Deployments",
+      "Features Development",
+      "Laravel, Vue",
+      "Co-contributor"
+    ],
     imageUrls: [chalkboardA, chalkboardB, chalkboardC, chalkboardD, chalkboardE, chalkboardF],
     link: "https://chalkboard.com.ph/"
   },
