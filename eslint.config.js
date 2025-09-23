@@ -34,8 +34,7 @@ export default [
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "react/prop-types": false,
       ...prettier.configs.recommended.rules,
-      "prettier/prettier": ["error", { endOfLine: "auto" }],
-      "vue/multi-word-component-names": "off"
+      "prettier/prettier": ["error", { endOfLine: "auto" }]
     }
   }
 ];
