@@ -52,12 +52,14 @@ import soloAlertA from "./assets/images/solo-alert/solo-alert-a.webp";
 import soloAlertB from "./assets/images/solo-alert/solo-alert-b.webp";
 import soloAlertC from "./assets/images/solo-alert/solo-alert-c.webp";
 import soloAlertD from "./assets/images/solo-alert/solo-alert-d.webp";
-// import soloAlertE from "./assets/images/solo-alert/solo-alert-e.webp";
+import soloAlertE from "./assets/images/solo-alert/solo-alert-e.webp";
+import soloAlertF from "./assets/images/solo-alert/solo-alert-f.webp";
+import soloAlertG from "./assets/images/solo-alert/solo-alert-g.webp";
 
 import soloAlertApiA from "./assets/images/solo-alert/solo-alert-api-a.webp";
 import soloAlertApiB from "./assets/images/solo-alert/solo-alert-api-b.webp";
 import soloAlertApiC from "./assets/images/solo-alert/solo-alert-api-c.webp";
-import soloAlertCheckInsOnlyEr from "./assets/images/solo-alert/solo-alert-check-ins-only-er.webp";
+import soloAlertApiD from "./assets/images/solo-alert/solo-alert-api-d.webp";
 import soloAlertCmsA from "./assets/images/solo-alert/solo-alert-cms-a.webp";
 
 import lifestylerA from "./assets/images/lifestyler/lifestyler-a.webp";
@@ -95,7 +97,7 @@ const projects = [
   },
   {
     title: "LifeStyler",
-    subtitle: "Jun 2025 - Sep 2025",
+    subtitle: "Jun 2025 - Oct 2025",
     descriptions: [
       "A Job Matching platform where Job Seekers and Employers find each other through a matching algorithm."
     ],
@@ -133,12 +135,14 @@ const projects = [
       soloAlertB,
       soloAlertC,
       soloAlertD,
-      // soloAlertE,
-      soloAlertCheckInsOnlyEr,
+      soloAlertE,
+      soloAlertF,
+      soloAlertG,
       soloAlertCmsA,
       soloAlertApiA,
       soloAlertApiB,
-      soloAlertApiC
+      soloAlertApiC,
+      soloAlertApiD
     ],
     link: "https://solo-alert.com/"
   },
@@ -186,7 +190,7 @@ const projects = [
       chalkboardAralD,
       chalkboardAralE
     ],
-    link: "https://aral.chalkboard.com.ph/"
+    link: "https://chalkboard.com.ph/"
   },
   {
     title: "Chalkboard Aral AMS",
@@ -223,8 +227,8 @@ const projects = [
       "Laravel, Vue",
       "Co-contributor"
     ],
-    imageUrls: [chalkboardA, chalkboardB, chalkboardC, chalkboardD, chalkboardE, chalkboardF],
-    link: "https://chalkboard.com.ph/"
+    imageUrls: [chalkboardA, chalkboardB, chalkboardC, chalkboardD, chalkboardE, chalkboardF]
+    // link: "https://chalkboard.com.ph/"
   },
   {
     title: "Chalkboard Manager",
