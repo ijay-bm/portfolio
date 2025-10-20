@@ -29,6 +29,10 @@ import spacefarersC from "./assets/images/spacefarers/spacefarers-c.webp";
 import spacefarersD from "./assets/images/spacefarers/spacefarers-d.webp";
 import spacefarersE from "./assets/images/spacefarers/spacefarers-e.webp";
 
+import crwnClothingA from "./assets/images/crwn-clothing/crwn-clothing-a.webp";
+import crwnClothingB from "./assets/images/crwn-clothing/crwn-clothing-b.webp";
+import crwnClothingC from "./assets/images/crwn-clothing/crwn-clothing-c.webp";
+
 import personalPageA from "./assets/images/personal-page/personal-page-a.webp";
 import personalPageB from "./assets/images/personal-page/personal-page-b.webp";
 
@@ -238,6 +242,14 @@ const projects = [
     ],
     roles: ["Full Stack Developer", "AWS Infrastructure Maintainer", "Sole Contributor"],
     imageUrls: [chalkboardManagerA, chalkboardManagerB, chalkboardManagerC, chalkboardManagerD]
+  },
+  {
+    title: "Crwn Clothing",
+    subtitle: "Oct 2025",
+    descriptions: ["A small-medium sized e-commerce React (React Router v7) project."],
+    roles: ["Sole Contributor"],
+    imageUrls: [crwnClothingA, crwnClothingB, crwnClothingC],
+    link: "https://warm-selkie-a6bbd8.netlify.app/"
   },
   {
     title: "Spacefarers",
