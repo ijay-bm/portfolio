@@ -83,9 +83,53 @@ import lifestylerM from "./assets/images/lifestyler/lifestyler-m.webp";
 import blendedServicesA from "./assets/images/blended-services/blended-services-a.webp";
 import blendedServicesB from "./assets/images/blended-services/blended-services-b.webp";
 
+
+import betterFitMobileA from "./assets/images/better-fit/better-fit-mobile-a.webp";
+import betterFitMobileB from "./assets/images/better-fit/better-fit-mobile-b.webp";
+import betterFitMobileC from "./assets/images/better-fit/better-fit-mobile-c.webp";
+import betterFitMobileD from "./assets/images/better-fit/better-fit-mobile-d.webp";
+import betterFitMobileE from "./assets/images/better-fit/better-fit-mobile-e.webp";
+
+import betterFitCmsA from "./assets/images/better-fit/better-fit-cms-a.webp";
+import betterFitCmsB from "./assets/images/better-fit/better-fit-cms-b.webp";
+import betterFitCmsC from "./assets/images/better-fit/better-fit-cms-c.webp";
+import betterFitCmsD from "./assets/images/better-fit/better-fit-cms-d.webp";
+import betterFitCmsE from "./assets/images/better-fit/better-fit-cms-e.webp";
+import betterFitCmsF from "./assets/images/better-fit/better-fit-cms-f.webp";
+import betterFitCmsG from "./assets/images/better-fit/better-fit-cms-g.webp";
+
+import betterFitApiA from "./assets/images/better-fit/better-fit-api-a.webp";
+import betterFitApiB from "./assets/images/better-fit/better-fit-api-b.webp";
+
+import betterFitSchemaA from "./assets/images/better-fit/better-fit-schema-a.webp";
+
 import UnifiedProjectCarousel from "./components/UnifiedProjectCarousel";
 
 const projects = [
+  {
+    title: "Better Fit",
+    subtitle: "Oct 2025 - Present",
+    descriptions: ["An fitness application that matches users with plans according to their fitness goals."],
+    roles: ["Backend Developer", "Proprietary Framework, Laravel", "Co-contributor"],
+    imageUrls: [
+      betterFitMobileA,
+      betterFitMobileB,
+      betterFitMobileC,
+      betterFitMobileD,
+      betterFitMobileE,
+      betterFitCmsA,
+      betterFitCmsB,
+      betterFitCmsC,
+      betterFitCmsD,
+      betterFitCmsE,
+      betterFitCmsF,
+      betterFitCmsG,
+      betterFitApiA,
+      betterFitApiB,
+      betterFitSchemaA,
+    ],
+    link: "https://betterfit.fit/"
+  },
   {
     title: "Blended Services",
     subtitle: "Aug 2025 - Sep 2025",
