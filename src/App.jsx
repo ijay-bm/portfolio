@@ -83,7 +83,6 @@ import lifestylerM from "./assets/images/lifestyler/lifestyler-m.webp";
 import blendedServicesA from "./assets/images/blended-services/blended-services-a.webp";
 import blendedServicesB from "./assets/images/blended-services/blended-services-b.webp";
 
-
 import betterFitMobileA from "./assets/images/better-fit/better-fit-mobile-a.webp";
 import betterFitMobileB from "./assets/images/better-fit/better-fit-mobile-b.webp";
 import betterFitMobileC from "./assets/images/better-fit/better-fit-mobile-c.webp";
@@ -97,19 +96,43 @@ import betterFitCmsD from "./assets/images/better-fit/better-fit-cms-d.webp";
 import betterFitCmsE from "./assets/images/better-fit/better-fit-cms-e.webp";
 import betterFitCmsF from "./assets/images/better-fit/better-fit-cms-f.webp";
 import betterFitCmsG from "./assets/images/better-fit/better-fit-cms-g.webp";
-
 import betterFitApiA from "./assets/images/better-fit/better-fit-api-a.webp";
 import betterFitApiB from "./assets/images/better-fit/better-fit-api-b.webp";
-
 import betterFitSchemaA from "./assets/images/better-fit/better-fit-schema-a.webp";
+
+import adrfFoundationA from "./assets/images/adrf-foundation/adrf-foundation-a.webp";
+import adrfFoundationB from "./assets/images/adrf-foundation/adrf-foundation-b.webp";
+import adrfFoundationC from "./assets/images/adrf-foundation/adrf-foundation-c.webp";
 
 import UnifiedProjectCarousel from "./components/UnifiedProjectCarousel";
 
 const projects = [
   {
+    title: "ADRF Foundation",
+    subtitle: "Feb 2026 - March 2026",
+    // descriptions: ["A crowdfunding platform for social initiatives and programs in Africa."],
+    descriptions: [
+      "Laravel backend for crowdfunding platform supporting African development initiatives (ADRF Foundation).",
+      // "Contributed to production readiness, bug fixes, Stripe/Sumsub integration stabilization, and AWS environment transition during resumed sprint."
+    ],
+    roles: [
+      "Backend Developer",
+      "Supported Development of new features",
+      "Proprietary Framework, Laravel",
+      "Minor contributor"
+    ],
+    imageUrls: [
+      adrfFoundationA,
+      adrfFoundationB,
+      adrfFoundationC,
+    ],
+    link: "https://www.adrf.app"
+  },
+
+  {
     title: "Better Fit",
-    subtitle: "Oct 2025 - Present",
-    descriptions: ["An fitness application that matches users with plans according to their fitness goals."],
+    subtitle: "Oct 2025 - Jan 2026",
+    descriptions: ["A fitness application that matches users with plans according to their fitness goals."],
     roles: ["Backend Developer", "Proprietary Framework, Laravel", "Co-contributor"],
     imageUrls: [
       betterFitMobileA,
