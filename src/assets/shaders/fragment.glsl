@@ -29,4 +29,6 @@ void main() {
 
   // Mix between the two textures based on progress
   gl_FragColor = mix(current, next, progress);
+
+  #include <colorspace_fragment>
 }

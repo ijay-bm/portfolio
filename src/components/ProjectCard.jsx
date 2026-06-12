@@ -128,7 +128,11 @@ const ProjectCard = ({ project, position = [0, 0, 0], disabled = false }) => {
 
         {project.descriptions?.length &&
           project.descriptions.map((description, index) => (
-            <Box key={`desc-${index}`} centerAnchor>
+            <Box
+              key={`desc-${index}`}
+              centerAnchor
+              marginBottom={index < project.descriptions.length - 1 ? 0.05 : 0}
+            >
               <Text
                 fontSize={0.063}
                 maxWidth={maxTextWidth}

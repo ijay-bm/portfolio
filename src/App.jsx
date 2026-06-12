@@ -105,34 +105,26 @@ import adrfFoundationB from "./assets/images/adrf-foundation/adrf-foundation-b.w
 import adrfFoundationC from "./assets/images/adrf-foundation/adrf-foundation-c.webp";
 
 import UnifiedProjectCarousel from "./components/UnifiedProjectCarousel";
-
 const projects = [
   {
     title: "ADRF Foundation",
     subtitle: "Feb 2026 - March 2026",
-    // descriptions: ["A crowdfunding platform for social initiatives and programs in Africa."],
     descriptions: [
-      "Laravel backend for crowdfunding platform supporting African development initiatives (ADRF Foundation).",
-      // "Contributed to production readiness, bug fixes, Stripe/Sumsub integration stabilization, and AWS environment transition during resumed sprint."
+      "A crowdfunding platform supporting African development initiatives.",
+      "Supported production readiness during a resumed development phase: bug fixes, Stripe/Sumsub integration stabilization, and AWS environment transition."
     ],
-    roles: [
-      "Backend Developer",
-      "Supported Development of new features",
-      "Proprietary Framework, Laravel",
-      "Minor contributor"
-    ],
-    imageUrls: [
-      adrfFoundationA,
-      adrfFoundationB,
-      adrfFoundationC,
-    ],
+    roles: ["Backend Developer", "Proprietary Framework, Laravel", "Minor contributor"],
+    imageUrls: [adrfFoundationA, adrfFoundationB, adrfFoundationC],
     link: "https://www.adrf.app"
   },
 
   {
     title: "Better Fit",
     subtitle: "Oct 2025 - Jan 2026",
-    descriptions: ["A fitness application that matches users with plans according to their fitness goals."],
+    descriptions: [
+      "A fitness application that matches users with plans according to their fitness goals.",
+      "Designed and implemented the backend APIs, database schema, and CMS."
+    ],
     roles: ["Backend Developer", "Proprietary Framework, Laravel", "Co-contributor"],
     imageUrls: [
       betterFitMobileA,
@@ -149,20 +141,17 @@ const projects = [
       betterFitCmsG,
       betterFitApiA,
       betterFitApiB,
-      betterFitSchemaA,
+      betterFitSchemaA
     ],
     link: "https://betterfit.fit/"
   },
   {
     title: "Blended Services",
     subtitle: "Aug 2025 - Sep 2025",
-    descriptions: ["A web app for logging the states of plants and trees"],
-    roles: [
-      "Backend Developer",
-      "Supported Development of new features",
-      "Proprietary Framework, Laravel",
-      "Minor contributor"
+    descriptions: [
+      "A tree maintenance platform tracking maintenance frequency, status, and collaborative workflows."
     ],
+    roles: ["Backend Developer", "Proprietary Framework, Laravel", "Minor contributor"],
     imageUrls: [blendedServicesA, blendedServicesB],
     link: "https://www.btree.com.au/"
   },
@@ -170,7 +159,8 @@ const projects = [
     title: "LifeStyler",
     subtitle: "Jun 2025 - Oct 2025",
     descriptions: [
-      "A Job Matching platform where Job Seekers and Employers find each other through a matching algorithm."
+      "A job-matching platform where job seekers and employers find each other through a matching algorithm.",
+      "Built the Laravel backend API and CMS."
     ],
     roles: ["Backend Developer", "Proprietary Framework, Laravel", "Co-contributor"],
     imageUrls: [
@@ -193,8 +183,8 @@ const projects = [
     title: "Solo Alert",
     subtitle: "Apr 2025 - Aug 2025",
     descriptions: [
-      "A safety check-in application that allows soloists to create scheduled alerts and notify their safety circle if they fail to check in.",
-      "Features include customizable check-in schedules, emergency contacts management, and location sharing with trusted individuals during emergencies."
+      "A safety check-in application where soloists create scheduled alerts that notify their safety circle if they fail to check in.",
+      "Designed and implemented the backend: complex check-in scheduling, alert systems, and APIs consumed by an iOS app."
     ],
     roles: [
       "Full Stack (Primarily Backend) Developer",
@@ -221,12 +211,11 @@ const projects = [
     title: "Xcursion",
     subtitle: "Dec 2024 - Apr 2025",
     descriptions: [
-      "A risk management tool for schools used in assessing and mitigating risks in educational programs and excursions.",
-      "Implemented responsive UI components and integrated backend APIs for this Vue.js-based application"
+      "A risk management tool used by schools to assess and mitigate risks in educational programs and excursions.",
+      "Implemented responsive UI components from Figma designs and integrated backend APIs."
     ],
     roles: [
       "Frontend Developer (Figma Implementation)",
-      // "Proprietary Framework, Nuxt, Vuetify, Vue, Tailwind",
       "Proprietary Framework, Vue",
       "Co-contributor"
     ],
@@ -252,7 +241,9 @@ const projects = [
   {
     title: "Chalkboard Aral",
     subtitle: "Q3 2024",
-    descriptions: ["A landing page and information hub for all of Chalkboard's ARAL initiatives."],
+    descriptions: [
+      "A landing page and information hub for all of Chalkboard's ARAL initiatives. Setup AWS tools and deployed the WordPress install."
+    ],
     roles: ["AWS Infrastructure Maintainer", "Minor Contributor"],
     imageUrls: [
       chalkboardAralA,
@@ -268,7 +259,8 @@ const projects = [
     subtitle: "Q2 2024 — Q3 2024",
     descriptions: [
       "A QR code-based Attendance Monitoring System (AMS) for real-time token-based attendance tracking.",
-      "Utilizes handshakes between an overseer and a tutor to monitor attendance."
+      "Utilizes handshakes between an overseer and a tutor to monitor attendance.",
+      "Built end-to-end: application, database, and AWS infrastructure."
     ],
     roles: [
       "Full Stack Developer",
@@ -289,23 +281,23 @@ const projects = [
     title: "Chalkboard",
     subtitle: "Q4 2021 — Q3 2024",
     descriptions: [
-      "An online tutoring platform where learners and tutors can meet. A marketplace where tutors personalize your learning experience."
+      "An online tutoring marketplace where learners and tutors meet.",
+      "Integrated card payments (Xendit), e-wallet/bank payments (DragonPay), and geolocation-based localized pricing (MaxMind)."
     ],
     roles: [
       "Full Stack Developer",
-      "Deployments",
       "Features Development",
+      "Deployments",
       "Laravel, Vue",
       "Co-contributor"
     ],
     imageUrls: [chalkboardA, chalkboardB, chalkboardC, chalkboardD, chalkboardE, chalkboardF]
-    // link: "https://chalkboard.com.ph/"
   },
   {
     title: "Chalkboard Manager",
     subtitle: "Q4 2021 — Q3 2024",
     descriptions: [
-      "A back-office web app that manages the customer-facing Chalkboard tutoring marketplace"
+      "A back-office web app that manages the customer-facing Chalkboard tutoring marketplace."
     ],
     roles: ["Full Stack Developer", "AWS Infrastructure Maintainer", "Sole Contributor"],
     imageUrls: [chalkboardManagerA, chalkboardManagerB, chalkboardManagerC, chalkboardManagerD]
@@ -313,7 +305,9 @@ const projects = [
   {
     title: "Crwn Clothing",
     subtitle: "Oct 2025",
-    descriptions: ["A small-medium sized e-commerce React (React Router v7) project."],
+    descriptions: [
+      "A small-medium e-commerce project built with React and React Router v7, from the Complete React Developer course."
+    ],
     roles: ["Sole Contributor"],
     imageUrls: [crwnClothingA, crwnClothingB, crwnClothingC],
     link: "https://warm-selkie-a6bbd8.netlify.app/"
@@ -321,15 +315,15 @@ const projects = [
   {
     title: "Spacefarers",
     subtitle: "Q3 2022",
-    descriptions: ["A SAMPLE landing page for an imaginary org called Spacefarers."],
+    descriptions: ["A sample landing page for an imaginary org called Spacefarers."],
     roles: ["Sole Contributor"],
     imageUrls: [spacefarersA, spacefarersB, spacefarersC, spacefarersD, spacefarersE],
     link: "https://ijay-bm.github.io/landing-page/"
   },
   {
-    title: "_ _ _ _ _ _",
+    title: "Personal Page",
     subtitle: "Q2 2021",
-    descriptions: ["A SAMPLE personal page for the imaginary person ______."],
+    descriptions: ["A sample personal page for an imaginary person."],
     roles: ["Sole Contributor"],
     imageUrls: [personalPageA, personalPageB],
     link: "https://ijay-bm.github.io/personal-page-01/"

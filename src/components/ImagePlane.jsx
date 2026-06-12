@@ -161,7 +161,7 @@ const ImagePlane = ({
   }, [textures, dispTexture, size.width, size.height]);
 
   useEffect(() => {
-    if (!isInitialized) {
+    if (!isInitialized || disabled) {
       return;
     }
     let autoPlayTimer;
@@ -236,7 +236,8 @@ const ImagePlane = ({
         (url) =>
           new Promise((resolve) => {
             const texture = textureLoader.load(url, (loadedTexture) => {
-              loadedTexture.encoding = THREE.SRGBColorSpace;
+              // loadedTexture.encoding = THREE.SRGBColorSpace;
+              loadedTexture.colorSpace = THREE.SRGBColorSpace;
               resolve(loadedTexture);
             });
           })

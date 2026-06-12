@@ -8,6 +8,7 @@ import ImagePlane from "./ImagePlane";
 import NextButton from "./NextButton";
 import PreviousButton from "./PreviousButton";
 import ProjectCard from "./ProjectCard";
+import { PerformanceMonitor } from "@react-three/drei";
 
 extend(geometry);
 
@@ -110,6 +111,7 @@ const ProjectPanel = ({
 };
 
 const UnifiedProjectCarousel = ({ projects }) => {
+  const [dpr, setDpr] = useState(1.5);
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
   const [initializations, initialized] = useState(0);
   const cameraZ = 6;
@@ -183,7 +185,7 @@ const UnifiedProjectCarousel = ({ projects }) => {
 
       <Canvas
         className={`duration-500 ${!hasFullyInitialized && "opacity-0"}`}
-        key={`${width}-${height}`} // Force canvas recreation on resize
+        // key={`${width}-${height}`} // Force canvas recreation on resize
         style={{ width, height }}
         camera={{
           fov: 45,
@@ -193,7 +195,11 @@ const UnifiedProjectCarousel = ({ projects }) => {
         }}
         resize={{ scroll: false }}
         gl={{ antialias: true }}
+        // dpr={[1, 1.5]}
+        // dpr={dpr}
       >
+        {/* <PerformanceMonitor onIncline={() => setDpr(2)} onDecline={() => setDpr(1.25)} /> */}
+
         <color attach="background" args={["#19191F"]} />
         <fog attach="fog" args={["#19191F", 0, 15]} />
 
