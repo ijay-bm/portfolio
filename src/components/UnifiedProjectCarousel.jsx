@@ -218,8 +218,8 @@ const UnifiedProjectCarousel = ({ projects }) => {
   // reflective-floor render target on mobile, where the reflector's blur
   // passes are the most expensive part of the frame.
   const dpr = perfTier === "low" ? [1, 1] : isMobile ? [1, 1.5] : [1, 2];
-  const reflectorResolution = isMobile ? 512 : 2048;
-  const reflectorBlur = isMobile ? [150, 50] : [300, 100];
+  const reflectorResolution = 512;
+  const reflectorBlur = [150, 50];
 
   const hasFullyInitialized = initializations === projects.length;
   // const hasFullyInitialized = true;
