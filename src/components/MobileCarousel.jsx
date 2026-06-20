@@ -9,40 +9,46 @@ const FADE_MS = 250;
 function ProjectDetails({ project, hasImages }) {
   return (
     <div
-      className={`flex flex-col justify-center gap-3 overflow-y-auto p-6 ${
-        hasImages ? "h-1/2 landscape:h-full landscape:w-1/2" : "flex-1 items-center text-center"
+      className={`flex flex-col overflow-y-auto p-6 ${
+        hasImages ? "h-1/2 landscape:h-full landscape:w-1/2" : "flex-1"
       }`}
     >
-      <h2 className="text-3xl font-semibold leading-tight sm:text-4xl">{project.title}</h2>
-      {project.subtitle && <p className="text-sm text-white/50 sm:text-base">{project.subtitle}</p>}
+      {/* my-auto centers the block when it fits, but collapses (no top clip) when
+          it overflows, so the title stays reachable and the box scrolls. */}
+      <div className={`my-auto flex flex-col gap-3 ${hasImages ? "" : "items-center text-center"}`}>
+        <h2 className="text-3xl font-semibold leading-tight sm:text-4xl">{project.title}</h2>
+        {project.subtitle && (
+          <p className="text-sm text-white/50 sm:text-base">{project.subtitle}</p>
+        )}
 
-      <div className="space-y-2 text-[19px] leading-relaxed text-white/80 sm:text-[22px]">
-        {project.descriptions?.map((description, i) => (
-          <p key={i}>{description}</p>
-        ))}
-      </div>
-
-      {project.roles?.length > 0 && (
-        <ul className="space-y-1 text-[19px] text-white/80 sm:text-[22px]">
-          {project.roles.map((role, i) => (
-            <li key={i} className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white/60 sm:h-2 sm:w-2" />
-              {role}
-            </li>
+        <div className="space-y-2 text-[19px] leading-relaxed text-white/80 sm:text-[22px]">
+          {project.descriptions?.map((description, i) => (
+            <p key={i}>{description}</p>
           ))}
-        </ul>
-      )}
+        </div>
 
-      {project.link && (
-        <a
-          href={project.link}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-2 inline-block w-fit rounded bg-white/10 px-6 py-2 text-sm tracking-wide backdrop-blur-sm transition hover:bg-white/20 active:scale-95 sm:text-base"
-        >
-          OPEN
-        </a>
-      )}
+        {project.roles?.length > 0 && (
+          <ul className="space-y-1 text-[19px] text-white/80 sm:text-[22px]">
+            {project.roles.map((role, i) => (
+              <li key={i} className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white/60 sm:h-2 sm:w-2" />
+                {role}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {project.link && (
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 inline-block w-fit rounded bg-white/10 px-6 py-2 text-sm tracking-wide backdrop-blur-sm transition hover:bg-white/20 active:scale-95 sm:text-base"
+          >
+            OPEN
+          </a>
+        )}
+      </div>
     </div>
   );
 }
