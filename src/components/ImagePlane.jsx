@@ -136,6 +136,11 @@ const ImagePlane = ({
   const { viewport, size } = useThree();
   const meshRef = useRef();
   const materialRef = useRef();
+  // Always holds the latest transition() so the autoplay interval never calls
+  // a stale closure (which would otherwise freeze it on the first image).
+  const transitionFnRef = useRef(null);
+  // Freeze the random interval once instead of re-rolling it on every render.
+  const [stableInterval] = useState(() => autoPlayInterval);
   const [textures, setTextures] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -161,22 +166,17 @@ const ImagePlane = ({
   }, [textures, dispTexture, size.width, size.height]);
 
   useEffect(() => {
-    if (!isInitialized || disabled) {
+    if (!isInitialized || disabled || !autoPlay) {
       return;
     }
-    let autoPlayTimer;
-    if (autoPlay) {
-      autoPlayTimer = setInterval(() => {
-        transition(1);
-      }, autoPlayInterval);
-    }
+    const autoPlayTimer = setInterval(() => {
+      transitionFnRef.current?.(1);
+    }, stableInterval);
 
     return () => {
-      if (autoPlayTimer) {
-        clearInterval(autoPlayTimer);
-      }
+      clearInterval(autoPlayTimer);
     };
-  }, [autoPlay, autoPlayInterval, isInitialized]);
+  }, [autoPlay, stableInterval, isInitialized, disabled]);
 
   // Updated calculateImageScale to handle various aspect ratios
   const calculateImageScale = (texture) => {
@@ -271,6 +271,10 @@ const ImagePlane = ({
 
     setIsTransitioning(true);
   };
+
+  // Keep the ref pointing at the freshest transition() every render so the
+  // autoplay interval always sees the current index / transitioning state.
+  transitionFnRef.current = transition;
 
   useFrame(() => {
     if (!transitionRef.current.active || !materialRef.current) return;
