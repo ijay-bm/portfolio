@@ -10,20 +10,20 @@ function ProjectDetails({ project, hasImages }) {
         hasImages ? "h-1/2 landscape:h-full landscape:w-1/2" : "flex-1"
       }`}
     >
-      <h2 className="text-2xl font-semibold leading-tight">{project.title}</h2>
-      {project.subtitle && <p className="text-sm text-white/50">{project.subtitle}</p>}
+      <h2 className="text-3xl font-semibold leading-tight sm:text-4xl">{project.title}</h2>
+      {project.subtitle && <p className="text-sm text-white/50 sm:text-base">{project.subtitle}</p>}
 
-      <div className="space-y-2 text-sm leading-relaxed text-white/80">
+      <div className="space-y-2 text-[19px] leading-relaxed text-white/80 sm:text-[22px]">
         {project.descriptions?.map((description, i) => (
           <p key={i}>{description}</p>
         ))}
       </div>
 
       {project.roles?.length > 0 && (
-        <ul className="space-y-1 text-sm text-white/80">
+        <ul className="space-y-1 text-[19px] text-white/80 sm:text-[22px]">
           {project.roles.map((role, i) => (
             <li key={i} className="flex items-center gap-2">
-              <span className="h-1 w-1 shrink-0 rounded-full bg-white/60" />
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white/60 sm:h-2 sm:w-2" />
               {role}
             </li>
           ))}
@@ -35,7 +35,7 @@ function ProjectDetails({ project, hasImages }) {
           href={project.link}
           target="_blank"
           rel="noreferrer"
-          className="mt-2 inline-block w-fit rounded bg-white/10 px-6 py-2 text-sm tracking-wide backdrop-blur-sm transition hover:bg-white/20 active:scale-95"
+          className="mt-2 inline-block w-fit rounded bg-white/10 px-6 py-2 text-sm tracking-wide backdrop-blur-sm transition hover:bg-white/20 active:scale-95 sm:text-base"
         >
           OPEN
         </a>

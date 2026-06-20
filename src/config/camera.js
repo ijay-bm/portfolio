@@ -14,7 +14,7 @@ export const ZOOM = 0.8;
 export const FOV = 45;
 // Focused panel's bounding box in world units, with breathing room. Used to fit
 // the camera distance to the viewport so the content never overflows the edges.
-const CONTENT_WIDTH = 5.2;
+const CONTENT_WIDTH = 6;
 const CONTENT_HEIGHT = 3;
 
 // Camera distance at which a CONTENT_WIDTH x CONTENT_HEIGHT box just fits the

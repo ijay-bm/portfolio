@@ -134,7 +134,7 @@ const ProjectCard = ({ project, position = [0, 0, 0], disabled = false }) => {
               marginBottom={index < project.descriptions.length - 1 ? 0.05 : 0}
             >
               <Text
-                fontSize={0.063}
+                fontSize={0.055}
                 maxWidth={maxTextWidth}
                 lineHeight={1.2}
                 material-toneMapped={false}
