@@ -140,6 +140,11 @@ const UnifiedProjectCarousel = ({ projects }) => {
   const [initializations, initialized] = useState(0);
   // Perf overlay: visible by default in dev, toggleable anywhere with Shift+P.
   const [showPerf, setShowPerf] = useState(import.meta.env.DEV);
+  // True briefly during a project change so the demand-mode loop renders
+  // continuously while the slide spring animates (its onChange invalidate
+  // alone starves for frames in production).
+  const [isNavigating, setIsNavigating] = useState(false);
+  const navTimer = useRef();
   const cameraZ = 6;
   const { width, height } = useResize();
   const isMobile = useIsMobile();
@@ -154,13 +159,25 @@ const UnifiedProjectCarousel = ({ projects }) => {
   const hasFullyInitialized = initializations === projects.length;
   // const hasFullyInitialized = true;
 
+  // Keep rendering continuously until the slide spring settles (~1.2s), then
+  // fall back to demand mode. Resets on rapid presses so spamming stays smooth.
+  const startNavRender = useCallback(() => {
+    setIsNavigating(true);
+    clearTimeout(navTimer.current);
+    navTimer.current = setTimeout(() => setIsNavigating(false), 1400);
+  }, []);
+
   const handlePrevious = useCallback(() => {
     setCurrentProjectIndex((prev) => (prev - 1 + projects.length) % projects.length);
-  }, [projects.length]);
+    startNavRender();
+  }, [projects.length, startNavRender]);
 
   const handleNext = useCallback(() => {
     setCurrentProjectIndex((prev) => (prev + 1) % projects.length);
-  }, [projects.length]);
+    startNavRender();
+  }, [projects.length, startNavRender]);
+
+  useEffect(() => () => clearTimeout(navTimer.current), []);
 
   useEffect(() => {
     const handlePerfToggle = (event) => {
@@ -276,7 +293,7 @@ const UnifiedProjectCarousel = ({ projects }) => {
         resize={{ scroll: false }}
         gl={{ antialias: !isMobile }}
         dpr={dpr}
-        frameloop="demand"
+        frameloop={showPerf || isNavigating ? "always" : "demand"}
       >
         {showPerf && (
           <Suspense fallback={null}>
