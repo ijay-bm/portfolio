@@ -202,14 +202,13 @@ const ImagePlane = ({
   imageUrls,
   transitionDuration = 1000,
   scaleX = 4,
-  scaleY = 2,
   disabled = false,
   marginRight = 0,
   autoPlay = true,
   autoPlayInterval = Math.floor(Math.random() * 1000 + 3000),
   initialized = () => {}
 }) => {
-  const { viewport, size, invalidate } = useThree();
+  const { size, invalidate } = useThree();
   const meshRef = useRef();
   const materialRef = useRef();
   // Always holds the latest transition() so the autoplay interval never calls
@@ -314,8 +313,7 @@ const ImagePlane = ({
       imageUrls.map(
         (url) =>
           new Promise((resolve) => {
-            const texture = textureLoader.load(url, (loadedTexture) => {
-              // loadedTexture.encoding = THREE.SRGBColorSpace;
+            textureLoader.load(url, (loadedTexture) => {
               loadedTexture.colorSpace = THREE.SRGBColorSpace;
               resolve(loadedTexture);
             });

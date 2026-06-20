@@ -6,7 +6,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import prettier from "eslint-plugin-prettier";
 
 export default [
-  { ignores: ["dist"] },
+  { ignores: ["dist", "**/*copy*"] },
   {
     files: ["**/*.{js,jsx}"],
     languageOptions: {
@@ -32,7 +32,10 @@ export default [
       ...reactHooks.configs.recommended.rules,
       "react/jsx-no-target-blank": "off",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-      "react/prop-types": false,
+      "react/prop-types": "off",
+      // react-three-fiber uses many non-DOM JSX props (args, attach, position,
+      // rotation, ...) that this DOM-oriented rule flags as unknown.
+      "react/no-unknown-property": "off",
       ...prettier.configs.recommended.rules,
       "prettier/prettier": ["error", { endOfLine: "auto" }]
     }
