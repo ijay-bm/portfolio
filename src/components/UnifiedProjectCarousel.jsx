@@ -8,7 +8,6 @@ import ImagePlane from "./ImagePlane";
 import NextButton from "./NextButton";
 import PreviousButton from "./PreviousButton";
 import ProjectCard from "./ProjectCard";
-import { PerformanceMonitor } from "@react-three/drei";
 
 // Lazy-loaded so the perf overlay's code is only downloaded when it's toggled
 // on (Shift+P), keeping it out of the default production payload.
@@ -16,7 +15,15 @@ const Perf = lazy(() => import("r3f-perf").then((module) => ({ default: module.P
 
 extend(geometry);
 
+// --- Framing knobs (tweak freely) ---
+// Content (focused panel) height in world units.
 const BASE_Y = 0;
+// Camera eye height. The gap between CAMERA_Y and BASE_Y shifts the content
+// vertically in frame: lower CAMERA_Y (or raise BASE_Y) pushes content UP.
+const CAMERA_Y = 0;
+// Scales the auto-fit distance: 1 = exact fit, <1 zooms in (bigger, but wide
+// content may clip the edges), >1 zooms out (smaller, more margin).
+const ZOOM = 0.8;
 
 // Vertical field of view of the scene camera, in degrees.
 const FOV = 45;
@@ -123,13 +130,7 @@ const DeviceBenchmark = ({ onGraded, sampleMs = 800, warmupFrames = 15 }) => {
   return null;
 };
 
-const ProjectPanel = ({
-  project,
-  index,
-  currentProjectIndex,
-  cameraZ = 0,
-  initialized = () => {}
-}) => {
+const ProjectPanel = ({ project, index, currentProjectIndex, initialized = () => {} }) => {
   const distanceFromCurrent = Math.abs(index - currentProjectIndex);
   const isFocused = currentProjectIndex === index;
   const invalidate = useThree((state) => state.invalidate);
@@ -212,7 +213,7 @@ const UnifiedProjectCarousel = ({ projects }) => {
 
   // Pull the camera to a distance where the focused panel fits the current
   // viewport instead of overflowing on narrower aspect ratios.
-  const cameraZ = fitCameraZ(width, height);
+  const cameraZ = fitCameraZ(width, height) * ZOOM;
 
   // Device-tiered render settings: cap the pixel ratio and shrink the
   // reflective-floor render target on mobile, where the reflector's blur
@@ -366,7 +367,7 @@ const UnifiedProjectCarousel = ({ projects }) => {
           fov: FOV,
           near: 0.1,
           far: 200,
-          position: [0, BASE_Y, cameraZ]
+          position: [0, CAMERA_Y, cameraZ]
         }}
         resize={{ scroll: false }}
         gl={{ antialias: !isMobile }}
@@ -390,8 +391,6 @@ const UnifiedProjectCarousel = ({ projects }) => {
             project={project}
             index={index}
             currentProjectIndex={currentProjectIndex}
-            totalProjects={projects.length}
-            cameraZ={cameraZ}
             initialized={() => initialized((prev) => prev + 1)}
           />
         ))}
