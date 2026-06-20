@@ -1,6 +1,6 @@
 import { animated, useSpring } from "@react-spring/three";
 import { Environment, MeshReflectorMaterial } from "@react-three/drei";
-import { Canvas, extend, useThree } from "@react-three/fiber";
+import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
 import { Flex } from "@react-three/flex";
 import { geometry } from "maath";
 import { lazy, Suspense, useCallback, useEffect, useState, useRef } from "react";
@@ -15,6 +15,27 @@ import { PerformanceMonitor } from "@react-three/drei";
 const Perf = lazy(() => import("r3f-perf").then((module) => ({ default: module.Perf })));
 
 extend(geometry);
+
+const BASE_Y = 0;
+
+// Vertical field of view of the scene camera, in degrees.
+const FOV = 45;
+// Focused panel's bounding box in world units, with breathing room. Used to fit
+// the camera distance to the viewport so the content never overflows the edges.
+const CONTENT_WIDTH = 5.2;
+const CONTENT_HEIGHT = 3;
+
+// Camera distance at which a CONTENT_WIDTH x CONTENT_HEIGHT box just fits the
+// given viewport. Narrower / taller viewports push the camera back; wide ones
+// let it move in closer. Keeps the focused panel framed across aspect ratios
+// (the focused panel sits at z=0, so this distance is also its apparent size).
+const fitCameraZ = (viewportWidth, viewportHeight) => {
+  const aspect = viewportWidth / viewportHeight;
+  const halfFov = (FOV * Math.PI) / 180 / 2;
+  const distForHeight = CONTENT_HEIGHT / (2 * Math.tan(halfFov));
+  const distForWidth = CONTENT_WIDTH / (2 * Math.tan(halfFov) * aspect);
+  return Math.max(distForHeight, distForWidth);
+};
 
 // Separate hook to handle resize
 const useResize = () => {
@@ -58,10 +79,48 @@ const useIsMobile = () => {
     ) {
       return true;
     }
-    return typeof window !== "undefined" && window.innerWidth < 768;
+    return typeof window !== "undefined" && window.innerWidth < 640;
   });
 
   return isMobile;
+};
+
+// Minimum sustained FPS (rendering the full scene, reflection included) for a
+// device to keep the expensive effects. Below this they're dropped.
+const MIN_FPS_FOR_REFLECTION = 50;
+
+// One-shot capability probe: renders the real scene for a moment, measures the
+// sustained frame rate (after a warm-up to skip shader / reflector-FBO compile
+// spikes), and reports it once so we keep the reflection only on machines that
+// can actually hold it.
+const DeviceBenchmark = ({ onGraded, sampleMs = 800, warmupFrames = 15 }) => {
+  const invalidate = useThree((state) => state.invalidate);
+  const stats = useRef({ warmed: 0, frames: 0, start: 0, done: false });
+
+  useFrame(() => {
+    const s = stats.current;
+    if (s.done) {
+      return;
+    }
+    if (s.warmed < warmupFrames) {
+      s.warmed += 1;
+      invalidate();
+      return;
+    }
+    if (s.start === 0) {
+      s.start = performance.now();
+    }
+    s.frames += 1;
+    const elapsed = performance.now() - s.start;
+    if (elapsed >= sampleMs) {
+      s.done = true;
+      onGraded((s.frames / elapsed) * 1000);
+    } else {
+      invalidate();
+    }
+  });
+
+  return null;
 };
 
 const ProjectPanel = ({
@@ -81,8 +140,8 @@ const ProjectPanel = ({
   const { position } = useSpring({
     position: [
       isFocused ? 0 : currentProjectIndex < index ? baseX : -10,
-      0.4,
-      isFocused ? cameraZ - 6 : currentProjectIndex < index ? baseZ : 0
+      BASE_Y,
+      isFocused ? 0 : currentProjectIndex < index ? baseZ : 0
     ],
     config: {
       mass: 1.5,
@@ -145,19 +204,38 @@ const UnifiedProjectCarousel = ({ projects }) => {
   // alone starves for frames in production).
   const [isNavigating, setIsNavigating] = useState(false);
   const navTimer = useRef();
-  const cameraZ = 6;
+  // Device capability tier from a one-time benchmark: "measuring" until graded,
+  // then "high" (keep reflection) or "low" (drop it and lighten the render).
+  const [perfTier, setPerfTier] = useState("measuring");
   const { width, height } = useResize();
   const isMobile = useIsMobile();
+
+  // Pull the camera to a distance where the focused panel fits the current
+  // viewport instead of overflowing on narrower aspect ratios.
+  const cameraZ = fitCameraZ(width, height);
 
   // Device-tiered render settings: cap the pixel ratio and shrink the
   // reflective-floor render target on mobile, where the reflector's blur
   // passes are the most expensive part of the frame.
-  const dpr = isMobile ? [1, 1.5] : [1, 2];
+  const dpr = perfTier === "low" ? [1, 1] : isMobile ? [1, 1.5] : [1, 2];
   const reflectorResolution = isMobile ? 512 : 2048;
   const reflectorBlur = isMobile ? [150, 50] : [300, 100];
 
   const hasFullyInitialized = initializations === projects.length;
   // const hasFullyInitialized = true;
+
+  // Run the benchmark once the scene is fully loaded; keep the reflection while
+  // measuring (so its cost is included) and after, only on "high" devices.
+  const isBenchmarking = hasFullyInitialized && perfTier === "measuring";
+  const showReflection = perfTier !== "low";
+
+  const handleGraded = useCallback((avgFps) => {
+    if (import.meta.env.DEV) {
+      const tier = avgFps >= MIN_FPS_FOR_REFLECTION ? "high" : "low";
+      console.log(`device benchmark: ${Math.round(avgFps)} fps -> ${tier}`);
+    }
+    setPerfTier(avgFps >= MIN_FPS_FOR_REFLECTION ? "high" : "low");
+  }, []);
 
   // Keep rendering continuously until the slide spring settles (~1.2s), then
   // fall back to demand mode. Resets on rapid presses so spamming stays smooth.
@@ -285,21 +363,23 @@ const UnifiedProjectCarousel = ({ projects }) => {
         key={`${width}-${height}`} // Force canvas recreation on resize
         style={{ width, height }}
         camera={{
-          fov: 45,
+          fov: FOV,
           near: 0.1,
           far: 200,
-          position: [0, 0, cameraZ]
+          position: [0, BASE_Y, cameraZ]
         }}
         resize={{ scroll: false }}
         gl={{ antialias: !isMobile }}
         dpr={dpr}
-        frameloop={showPerf || isNavigating ? "always" : "demand"}
+        frameloop={showPerf || isNavigating || isBenchmarking ? "always" : "demand"}
       >
         {showPerf && (
           <Suspense fallback={null}>
             <Perf position="top-left" />
           </Suspense>
         )}
+
+        {isBenchmarking && <DeviceBenchmark onGraded={handleGraded} />}
 
         <color attach="background" args={["#19191F"]} />
         <fog attach="fog" args={["#19191F", 0, 15]} />
@@ -316,23 +396,24 @@ const UnifiedProjectCarousel = ({ projects }) => {
           />
         ))}
 
-        {/* Adjusted reflective floor position to be lower */}
-        <mesh position={[0, -0.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[50, 50]} />
-          <MeshReflectorMaterial
-            blur={reflectorBlur}
-            resolution={reflectorResolution}
-            mixBlur={0.5}
-            mixStrength={80}
-            roughness={1}
-            depthScale={1.2}
-            minDepthThreshold={0.4}
-            maxDepthThreshold={1.4}
-            color="#050505"
-            metalness={0.8}
-            transparent={true}
-          />
-        </mesh>
+        {showReflection && (
+          <mesh position={[0, -BASE_Y - 1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[50, 50]} />
+            <MeshReflectorMaterial
+              blur={reflectorBlur}
+              resolution={reflectorResolution}
+              mixBlur={0.5}
+              mixStrength={80}
+              roughness={1}
+              depthScale={1.2}
+              minDepthThreshold={0.4}
+              maxDepthThreshold={1.4}
+              color="#050505"
+              metalness={0.8}
+              transparent={true}
+            />
+          </mesh>
+        )}
         <Environment preset="city" />
       </Canvas>
 
