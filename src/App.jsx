@@ -104,7 +104,11 @@ import adrfFoundationA from "./assets/images/adrf-foundation/adrf-foundation-a.w
 import adrfFoundationB from "./assets/images/adrf-foundation/adrf-foundation-b.webp";
 import adrfFoundationC from "./assets/images/adrf-foundation/adrf-foundation-c.webp";
 
+import { useState } from "react";
 import UnifiedProjectCarousel from "./components/UnifiedProjectCarousel";
+import MobileCarousel from "./components/MobileCarousel";
+import useLayoutMode from "./hooks/useLayoutMode";
+
 const projects = [
   {
     title: "ADRF Foundation",
@@ -337,14 +341,27 @@ const projects = [
 ];
 
 export default function App() {
+  const autoMode = useLayoutMode();
+  // null = follow the automatic width/height detection; otherwise a forced mode.
+  const [override, setOverride] = useState(null);
+  const mode = override ?? autoMode;
+
   return (
     <div className="relative h-full w-full">
       <h3 className="absolute left-1/2 top-5 z-10 -translate-x-1/2 tracking-widest">IJAY M.</h3>
-      <UnifiedProjectCarousel
-        projects={projects}
-        width={window.innerWidth}
-        height={window.innerHeight}
-      />
+      <button
+        type="button"
+        title="Switch rendering mode"
+        onClick={() => setOverride(mode === "compact" ? "desktop" : "compact")}
+        className="absolute right-4 top-4 z-20 rounded-md bg-white/10 px-3 py-1.5 text-xs tracking-wide text-white/70 backdrop-blur-sm transition hover:bg-white/20"
+      >
+        {mode === "compact" ? "3D" : "Lite"}
+      </button>
+      {mode === "compact" ? (
+        <MobileCarousel projects={projects} />
+      ) : (
+        <UnifiedProjectCarousel projects={projects} />
+      )}
     </div>
   );
 }

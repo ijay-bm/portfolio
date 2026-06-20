@@ -213,7 +213,7 @@ const UnifiedProjectCarousel = ({ projects }) => {
           type="button"
           style={{ opacity: showPerf ? 1 : 0.2 }}
           onClick={() => setShowPerf((prev) => !prev)}
-          className="absolute right-5 top-5 z-10 rounded-md bg-white/10 px-3 py-2 text-xs text-white/60 backdrop-blur-sm"
+          className="absolute right-5 top-[3rem] z-10 rounded-md bg-white/10 px-3 py-2 text-xs text-white/60 backdrop-blur-sm"
         >
           {showPerf ? "Hide FPS" : "Show Dx"}
         </button>
