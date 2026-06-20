@@ -122,13 +122,46 @@ const UnifiedProjectCarousel = ({ projects }) => {
   const hasFullyInitialized = initializations === projects.length;
   // const hasFullyInitialized = true;
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     setCurrentProjectIndex((prev) => (prev - 1 + projects.length) % projects.length);
-  };
+  }, [projects.length]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setCurrentProjectIndex((prev) => (prev + 1) % projects.length);
-  };
+  }, [projects.length]);
+
+  // Keyboard navigation: arrow keys cycle through projects once the scene is ready
+  useEffect(() => {
+    if (!hasFullyInitialized) {
+      return;
+    }
+
+    const handleKeyDown = (event) => {
+      // Ignore auto-repeat events fired while a key is held down
+      if (event.repeat) {
+        return;
+      }
+
+      switch (event.key) {
+        case "ArrowLeft":
+          event.preventDefault();
+          handlePrevious();
+          break;
+        case "ArrowRight":
+          event.preventDefault();
+          handleNext();
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [hasFullyInitialized, handlePrevious, handleNext]);
 
   return (
     <div className="fixed inset-0 overflow-hidden">
