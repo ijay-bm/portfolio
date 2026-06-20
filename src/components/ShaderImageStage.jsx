@@ -1,6 +1,6 @@
-import { shaderMaterial, useTexture } from "@react-three/drei";
+import { shaderMaterial } from "@react-three/drei";
 import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
-import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import dispUrl from "../assets/images/displacement.png";
 import fragmentContain from "../assets/shaders/fragmentContain.glsl";
@@ -59,60 +59,114 @@ function ImageChevron({ direction, onClick }) {
   );
 }
 
-// Fullscreen quad running the displacement shader. Loads the project's images,
-// shows the current one, and animates progress 0->1 when given a command.
+// Fullscreen quad running the displacement shader. Loads images lazily (only the
+// current one, then transition targets on demand) so entering an image-heavy
+// project doesn't decode + GPU-upload them all at once.
 function Scene({ images, index, command, onDone }) {
-  const { viewport, size } = useThree();
+  const { size, viewport } = useThree();
   const materialRef = useRef();
-  const stateRef = useRef({ active: false, to: 0, start: 0 });
+  const stateRef = useRef({ active: false });
+  const cacheRef = useRef(new Map());
+  const loaderRef = useRef();
+  if (!loaderRef.current) {
+    loaderRef.current = new THREE.TextureLoader();
+  }
+  const dispRef = useRef(null);
+  const [ready, setReady] = useState(false);
 
-  const textures = useTexture(images);
-  const disp = useTexture(dispUrl);
-
-  useLayoutEffect(() => {
-    textures.forEach((texture) => {
-      texture.colorSpace = THREE.SRGBColorSpace;
+  const getTexture = useCallback((url) => {
+    const cache = cacheRef.current;
+    const cached = cache.get(url);
+    if (cached) {
+      return Promise.resolve(cached);
+    }
+    return new Promise((resolve) => {
+      loaderRef.current.load(
+        url,
+        (texture) => {
+          texture.colorSpace = THREE.SRGBColorSpace;
+          cache.set(url, texture);
+          resolve(texture);
+        },
+        undefined,
+        () => resolve(null)
+      );
     });
-    disp.colorSpace = THREE.NoColorSpace;
-  }, [textures, disp]);
+  }, []);
 
-  // Project changed: abandon any in-flight transition so it can't finish (and
-  // call onDone) against the new project's textures.
+  // Load the displacement map once.
+  useEffect(() => {
+    loaderRef.current.load(dispUrl, (texture) => {
+      texture.colorSpace = THREE.NoColorSpace;
+      dispRef.current = texture;
+      if (materialRef.current) {
+        materialRef.current.disp = texture;
+      }
+    });
+  }, []);
+
+  // Abandon any in-flight transition when the project changes.
   useEffect(() => {
     stateRef.current.active = false;
   }, [images]);
 
-  // Idle: keep the current image on screen (skipped while a transition runs).
+  // Keep the canvas aspect uniform in sync with the element size.
   useEffect(() => {
-    const material = materialRef.current;
-    if (!material || stateRef.current.active) {
-      return;
+    if (materialRef.current) {
+      materialRef.current.canvasAspect = size.width / size.height;
     }
-    const i = Math.min(index, textures.length - 1);
-    material.disp = disp;
-    material.currentTexture = textures[i];
-    material.nextTexture = textures[i];
-    material.currentAspect = aspectOf(textures[i]);
-    material.nextAspect = aspectOf(textures[i]);
-    material.canvasAspect = size.width / size.height;
-    material.progress = 1;
-  }, [textures, disp, index, size.width, size.height]);
+  }, [size.width, size.height]);
 
-  // Start a transition when a new command arrives.
+  // Show the current image (loaded on demand), unless a transition is running.
   useEffect(() => {
-    const material = materialRef.current;
-    if (!material || !command) {
-      return;
+    if (stateRef.current.active) {
+      return undefined;
     }
-    material.disp = disp;
-    material.currentTexture = textures[index];
-    material.nextTexture = textures[command.to];
-    material.currentAspect = aspectOf(textures[index]);
-    material.nextAspect = aspectOf(textures[command.to]);
-    material.canvasAspect = size.width / size.height;
-    material.direction = command.direction;
-    material.progress = 0;
-    stateRef.current = { active: true, to: command.to, start: performance.now() };
+    let cancelled = false;
+    getTexture(images[Math.min(index, images.length - 1)]).then((texture) => {
+      if (cancelled || !materialRef.current || !texture) {
+        return;
+      }
+      const material = materialRef.current;
+      material.disp = dispRef.current;
+      material.currentTexture = texture;
+      material.nextTexture = texture;
+      material.currentAspect = aspectOf(texture);
+      material.nextAspect = aspectOf(texture);
+      material.progress = 1;
+      setReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [images, index, getTexture]);
+
+  // Start a transition when a new command arrives, loading the target on demand.
+  useEffect(() => {
+    if (!command) {
+      return undefined;
+    }
+    let cancelled = false;
+    Promise.all([getTexture(images[index]), getTexture(images[command.to])]).then(
+      ([fromTex, toTex]) => {
+        const material = materialRef.current;
+        if (cancelled || !material || !fromTex || !toTex) {
+          return;
+        }
+        material.disp = dispRef.current;
+        material.currentTexture = fromTex;
+        material.nextTexture = toTex;
+        material.currentAspect = aspectOf(fromTex);
+        material.nextAspect = aspectOf(toTex);
+        material.canvasAspect = size.width / size.height;
+        material.direction = command.direction;
+        material.progress = 0;
+        stateRef.current = { active: true, to: command.to, toTex, start: performance.now() };
+      }
+    );
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [command]);
 
@@ -126,17 +180,17 @@ function Scene({ images, index, command, onDone }) {
     material.progress = easeInOutCubic(t);
     if (t >= 1) {
       s.active = false;
-      material.currentTexture = textures[s.to];
-      material.nextTexture = textures[s.to];
-      material.currentAspect = aspectOf(textures[s.to]);
-      material.nextAspect = aspectOf(textures[s.to]);
+      material.currentTexture = s.toTex;
+      material.nextTexture = s.toTex;
+      material.currentAspect = aspectOf(s.toTex);
+      material.nextAspect = aspectOf(s.toTex);
       material.progress = 1;
       onDone(s.to);
     }
   });
 
   return (
-    <mesh scale={[viewport.width, viewport.height, 1]}>
+    <mesh scale={[viewport.width, viewport.height, 1]} visible={ready}>
       <planeGeometry args={[1, 1]} />
       <containTransitionMaterial ref={materialRef} transparent />
     </mesh>
@@ -179,13 +233,13 @@ export default function ShaderImageStage({ images }) {
   }, []);
 
   // Autoplay; depends on tick so any advance (manual or auto) restarts the timer.
+  // Depends on `images` (not just length) so changing project restarts the timer.
   useEffect(() => {
     if (images.length < 2) {
       return undefined;
     }
     const id = setInterval(() => advance(1), AUTOPLAY_MS);
     return () => clearInterval(id);
-    // Depend on `images` (not just length) so changing project restarts the timer.
   }, [images, advance, tick]);
 
   return (
@@ -197,9 +251,7 @@ export default function ShaderImageStage({ images }) {
         gl={{ alpha: true }}
         className="absolute inset-0"
       >
-        <Suspense fallback={null}>
-          <Scene images={images} index={index} command={command} onDone={handleDone} />
-        </Suspense>
+        <Scene images={images} index={index} command={command} onDone={handleDone} />
       </Canvas>
 
       {images.length > 1 && (
