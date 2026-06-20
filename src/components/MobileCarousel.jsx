@@ -1,7 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import NextButton from "./NextButton";
 import PreviousButton from "./PreviousButton";
 import ShaderImageStage from "./ShaderImageStage";
+
+// Project-change crossfade duration (keep in sync with the duration-[Xms] class).
+const FADE_MS = 250;
 
 function ProjectDetails({ project, hasImages }) {
   return (
@@ -46,17 +49,33 @@ function ProjectDetails({ project, hasImages }) {
 
 export default function MobileCarousel({ projects }) {
   const [projectIndex, setProjectIndex] = useState(0);
+  const [fading, setFading] = useState(false);
+  const fadingRef = useRef(false);
+  const fadeTimer = useRef();
   const project = projects[projectIndex];
   const hasImages = project.imageUrls?.length > 0;
 
-  const prevProject = useCallback(
-    () => setProjectIndex((p) => (p - 1 + projects.length) % projects.length),
+  // Fade the content out, swap project while invisible, then fade back in.
+  const changeProject = useCallback(
+    (dir) => {
+      if (fadingRef.current) {
+        return;
+      }
+      fadingRef.current = true;
+      setFading(true);
+      fadeTimer.current = setTimeout(() => {
+        setProjectIndex((p) => (p + dir + projects.length) % projects.length);
+        setFading(false);
+        fadingRef.current = false;
+      }, FADE_MS);
+    },
     [projects.length]
   );
-  const nextProject = useCallback(
-    () => setProjectIndex((p) => (p + 1) % projects.length),
-    [projects.length]
-  );
+
+  const prevProject = useCallback(() => changeProject(-1), [changeProject]);
+  const nextProject = useCallback(() => changeProject(1), [changeProject]);
+
+  useEffect(() => () => clearTimeout(fadeTimer.current), []);
 
   useEffect(() => {
     const onKey = (event) => {
@@ -75,7 +94,11 @@ export default function MobileCarousel({ projects }) {
 
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-[#19191F] pt-14 text-white">
-      <div className="flex flex-1 flex-col overflow-hidden pb-16 landscape:flex-row">
+      <div
+        className={`flex flex-1 flex-col overflow-hidden pb-16 transition-opacity duration-[250ms] ease-in-out landscape:flex-row ${
+          fading ? "opacity-0" : "opacity-100"
+        }`}
+      >
         {hasImages && (
           <div className="relative h-1/2 w-full landscape:h-full landscape:w-1/2">
             <ShaderImageStage images={project.imageUrls} />
