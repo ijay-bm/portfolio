@@ -133,7 +133,7 @@ const ImagePlane = ({
   autoPlayInterval = Math.floor(Math.random() * 1000 + 3000),
   initialized = () => {}
 }) => {
-  const { viewport, size } = useThree();
+  const { viewport, size, invalidate } = useThree();
   const meshRef = useRef();
   const materialRef = useRef();
   // Always holds the latest transition() so the autoplay interval never calls
@@ -305,6 +305,9 @@ const ImagePlane = ({
       materialRef.current.currentTexture = textures[transitionRef.current.nextIndex];
       materialRef.current.nextTexture = textures[transitionRef.current.nextIndex];
       materialRef.current.progress = 1.0;
+    } else {
+      // Demand mode: keep requesting frames until the transition completes.
+      invalidate();
     }
   });
 

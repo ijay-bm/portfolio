@@ -3,12 +3,16 @@ import { Environment, MeshReflectorMaterial } from "@react-three/drei";
 import { Canvas, extend, useThree } from "@react-three/fiber";
 import { Flex } from "@react-three/flex";
 import { geometry } from "maath";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState, useRef } from "react";
 import ImagePlane from "./ImagePlane";
 import NextButton from "./NextButton";
 import PreviousButton from "./PreviousButton";
 import ProjectCard from "./ProjectCard";
 import { PerformanceMonitor } from "@react-three/drei";
+
+// Lazy-loaded so the perf overlay's code is only downloaded when it's toggled
+// on (Shift+P), keeping it out of the default production payload.
+const Perf = lazy(() => import("r3f-perf").then((module) => ({ default: module.Perf })));
 
 extend(geometry);
 
@@ -43,6 +47,23 @@ const useResize = () => {
   return size;
 };
 
+// Detect a low-power / mobile device once at mount. Kept stable for the
+// session so the reflector render target and DPR don't thrash on resize or
+// orientation change (device class effectively never changes mid-session).
+const useIsMobile = () => {
+  const [isMobile] = useState(() => {
+    if (
+      typeof navigator !== "undefined" &&
+      /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    ) {
+      return true;
+    }
+    return typeof window !== "undefined" && window.innerWidth < 768;
+  });
+
+  return isMobile;
+};
+
 const ProjectPanel = ({
   project,
   index,
@@ -52,6 +73,7 @@ const ProjectPanel = ({
 }) => {
   const distanceFromCurrent = Math.abs(index - currentProjectIndex);
   const isFocused = currentProjectIndex === index;
+  const invalidate = useThree((state) => state.invalidate);
 
   const baseX = distanceFromCurrent * 0.8;
   const baseZ = distanceFromCurrent * -1;
@@ -68,7 +90,10 @@ const ProjectPanel = ({
       friction: 26,
       clamp: false,
       velocity: 0
-    }
+    },
+    // In demand mode the loop is asleep; request a render on each spring tick
+    // so the slide animation is actually drawn.
+    onChange: () => invalidate()
   });
 
   const hasInitialized = useRef(false);
@@ -111,14 +136,21 @@ const ProjectPanel = ({
 };
 
 const UnifiedProjectCarousel = ({ projects }) => {
-  const [dpr, setDpr] = useState(1.5);
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
   const [initializations, initialized] = useState(0);
+  // Perf overlay: visible by default in dev, toggleable anywhere with Shift+P.
+  const [showPerf, setShowPerf] = useState(import.meta.env.DEV);
   const cameraZ = 6;
   const { width, height } = useResize();
+  const isMobile = useIsMobile();
 
-  console.log("initializations: ", initializations);
-  console.log("projects.length - 1: ", projects.length);
+  // Device-tiered render settings: cap the pixel ratio and shrink the
+  // reflective-floor render target on mobile, where the reflector's blur
+  // passes are the most expensive part of the frame.
+  const dpr = isMobile ? [1, 1.5] : [1, 2];
+  const reflectorResolution = isMobile ? 512 : 2048;
+  const reflectorBlur = isMobile ? [150, 50] : [300, 100];
+
   const hasFullyInitialized = initializations === projects.length;
   // const hasFullyInitialized = true;
 
@@ -129,6 +161,21 @@ const UnifiedProjectCarousel = ({ projects }) => {
   const handleNext = useCallback(() => {
     setCurrentProjectIndex((prev) => (prev + 1) % projects.length);
   }, [projects.length]);
+
+  useEffect(() => {
+    const handlePerfToggle = (event) => {
+      if (event.shiftKey && event.code === "KeyP") {
+        event.preventDefault();
+        setShowPerf((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handlePerfToggle);
+
+    return () => {
+      window.removeEventListener("keydown", handlePerfToggle);
+    };
+  }, []);
 
   // Keyboard navigation: arrow keys cycle through projects once the scene is ready
   useEffect(() => {
@@ -218,7 +265,7 @@ const UnifiedProjectCarousel = ({ projects }) => {
 
       <Canvas
         className={`duration-500 ${!hasFullyInitialized && "opacity-0"}`}
-        // key={`${width}-${height}`} // Force canvas recreation on resize
+        key={`${width}-${height}`} // Force canvas recreation on resize
         style={{ width, height }}
         camera={{
           fov: 45,
@@ -227,11 +274,15 @@ const UnifiedProjectCarousel = ({ projects }) => {
           position: [0, 0, cameraZ]
         }}
         resize={{ scroll: false }}
-        gl={{ antialias: true }}
-        // dpr={[1, 1.5]}
-        // dpr={dpr}
+        gl={{ antialias: !isMobile }}
+        dpr={dpr}
+        frameloop="demand"
       >
-        {/* <PerformanceMonitor onIncline={() => setDpr(2)} onDecline={() => setDpr(1.25)} /> */}
+        {showPerf && (
+          <Suspense fallback={null}>
+            <Perf position="top-left" />
+          </Suspense>
+        )}
 
         <color attach="background" args={["#19191F"]} />
         <fog attach="fog" args={["#19191F", 0, 15]} />
@@ -252,8 +303,8 @@ const UnifiedProjectCarousel = ({ projects }) => {
         <mesh position={[0, -0.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[50, 50]} />
           <MeshReflectorMaterial
-            blur={[300, 100]}
-            resolution={2048}
+            blur={reflectorBlur}
+            resolution={reflectorResolution}
             mixBlur={0.5}
             mixStrength={80}
             roughness={1}
@@ -278,6 +329,17 @@ const UnifiedProjectCarousel = ({ projects }) => {
         onClick={handleNext}
         disabled={!hasFullyInitialized}
       />
+
+      {isMobile && (
+        <button
+          type="button"
+          style={{ opacity: showPerf ? 1 : 0.2 }}
+          onClick={() => setShowPerf((prev) => !prev)}
+          className="absolute right-5 top-5 z-10 rounded-md bg-white/10 px-3 py-2 text-xs text-white/60 backdrop-blur-sm"
+        >
+          {showPerf ? "Hide FPS" : "Show Dx"}
+        </button>
+      )}
     </div>
   );
 };
