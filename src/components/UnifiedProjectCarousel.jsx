@@ -6,6 +6,7 @@ import { BASE_Y, CAMERA_Y, FOV, ZOOM, fitCameraZ } from "../config/camera";
 import useIsMobile from "../hooks/useIsMobile";
 import useResize from "../hooks/useResize";
 import DeviceBenchmark from "./DeviceBenchmark";
+import LoadingDots from "./LoadingDots";
 import NextButton from "./NextButton";
 import PreviousButton from "./PreviousButton";
 import ProjectPanel from "./ProjectPanel";
@@ -136,52 +137,7 @@ const UnifiedProjectCarousel = ({ projects }) => {
       <div
         className={`absolute flex h-screen w-screen items-center justify-center duration-500 ${hasFullyInitialized && "opacity-0"}`}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="4em" height="4em" viewBox="0 0 32 32">
-          <circle cx={24} cy={12} r={0} fill="currentColor">
-            <animate
-              attributeName="r"
-              begin={0.99}
-              calcMode="spline"
-              dur="1.5s"
-              keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-              repeatCount="indefinite"
-              values="0;2;0;0"
-            ></animate>
-          </circle>
-          <circle cx={18} cy={12} r={0} fill="currentColor">
-            <animate
-              attributeName="r"
-              begin={0.67}
-              calcMode="spline"
-              dur="1.5s"
-              keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-              repeatCount="indefinite"
-              values="0;2;0;0"
-            ></animate>
-          </circle>
-          <circle cx={12} cy={12} r={0} fill="currentColor">
-            <animate
-              attributeName="r"
-              begin={0.33}
-              calcMode="spline"
-              dur="1.5s"
-              keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-              repeatCount="indefinite"
-              values="0;2;0;0"
-            ></animate>
-          </circle>
-          <circle cx={6} cy={12} r={0} fill="currentColor">
-            <animate
-              attributeName="r"
-              begin={0}
-              calcMode="spline"
-              dur="1.5s"
-              keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-              repeatCount="indefinite"
-              values="0;2;0;0"
-            ></animate>
-          </circle>
-        </svg>
+        <LoadingDots />
       </div>
 
       <Canvas
