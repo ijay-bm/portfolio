@@ -181,11 +181,19 @@ const ImagePlane = ({
   transitionFnRef.current = transition;
 
   useFrame(() => {
-    if (!transitionRef.current.active || !materialRef.current) return;
+    if (!materialRef.current) return;
+    const tr = transitionRef.current;
 
-    // materialRef.current.opacity = opacity.get();
+    if (!tr.active) {
+      // After a transition completes, keep the demand-mode loop alive briefly so
+      // the nav buttons' reappear (collapse-back) spring is actually rendered.
+      if (tr.cooldownUntil && Date.now() < tr.cooldownUntil) {
+        invalidate();
+      }
+      return;
+    }
 
-    const elapsed = Date.now() - transitionRef.current.startTime;
+    const elapsed = Date.now() - tr.startTime;
     const rawProgress = Math.min(elapsed / transitionDuration, 1);
     const progress = easeInOutCubic(rawProgress);
 
@@ -195,24 +203,25 @@ const ImagePlane = ({
     // Interpolate scales
     if (meshRef.current && scales.length > 0) {
       const currentScale = scales[currentIndex];
-      const nextScale = scales[transitionRef.current.nextIndex];
+      const nextScale = scales[tr.nextIndex];
       meshRef.current.scale.x = currentScale.x + (nextScale.x - currentScale.x) * progress;
       meshRef.current.scale.y = currentScale.y + (nextScale.y - currentScale.y) * progress;
     }
 
     if (rawProgress >= 1) {
-      setCurrentIndex(transitionRef.current.nextIndex);
+      setCurrentIndex(tr.nextIndex);
       setIsTransitioning(false);
-      transitionRef.current.active = false;
+      tr.active = false;
+      // Keep rendering ~0.8s so the buttons' reappear animation is drawn.
+      tr.cooldownUntil = Date.now() + 800;
 
       // Update final state
-      materialRef.current.currentTexture = textures[transitionRef.current.nextIndex];
-      materialRef.current.nextTexture = textures[transitionRef.current.nextIndex];
+      materialRef.current.currentTexture = textures[tr.nextIndex];
+      materialRef.current.nextTexture = textures[tr.nextIndex];
       materialRef.current.progress = 1.0;
-    } else {
-      // Demand mode: keep requesting frames until the transition completes.
-      invalidate();
     }
+
+    invalidate();
   });
 
   // useImperativeHandle(ref, () => ({
