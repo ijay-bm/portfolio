@@ -10,7 +10,7 @@ function ProjectDetails({ project, hasImages }) {
   return (
     <div
       className={`flex flex-col justify-center gap-3 overflow-y-auto p-6 ${
-        hasImages ? "h-1/2 landscape:h-full landscape:w-1/2" : "flex-1"
+        hasImages ? "h-1/2 landscape:h-full landscape:w-1/2" : "flex-1 items-center text-center"
       }`}
     >
       <h2 className="text-3xl font-semibold leading-tight sm:text-4xl">{project.title}</h2>
