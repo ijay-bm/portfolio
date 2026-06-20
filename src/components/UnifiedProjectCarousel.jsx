@@ -1,13 +1,14 @@
-import { animated, useSpring } from "@react-spring/three";
 import { Environment, MeshReflectorMaterial } from "@react-three/drei";
-import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
-import { Flex } from "@react-three/flex";
+import { Canvas, extend } from "@react-three/fiber";
 import { geometry } from "maath";
 import { lazy, Suspense, useCallback, useEffect, useState, useRef } from "react";
-import ImagePlane from "./ImagePlane";
+import { BASE_Y, CAMERA_Y, FOV, ZOOM, fitCameraZ } from "../config/camera";
+import useIsMobile from "../hooks/useIsMobile";
+import useResize from "../hooks/useResize";
+import DeviceBenchmark from "./DeviceBenchmark";
 import NextButton from "./NextButton";
 import PreviousButton from "./PreviousButton";
-import ProjectCard from "./ProjectCard";
+import ProjectPanel from "./ProjectPanel";
 
 // Lazy-loaded so the perf overlay's code is only downloaded when it's toggled
 // on (Shift+P), keeping it out of the default production payload.
@@ -15,185 +16,9 @@ const Perf = lazy(() => import("r3f-perf").then((module) => ({ default: module.P
 
 extend(geometry);
 
-// --- Framing knobs (tweak freely) ---
-// Content (focused panel) height in world units.
-const BASE_Y = 0;
-// Camera eye height. The gap between CAMERA_Y and BASE_Y shifts the content
-// vertically in frame: lower CAMERA_Y (or raise BASE_Y) pushes content UP.
-const CAMERA_Y = 0;
-// Scales the auto-fit distance: 1 = exact fit, <1 zooms in (bigger, but wide
-// content may clip the edges), >1 zooms out (smaller, more margin).
-const ZOOM = 0.8;
-
-// Vertical field of view of the scene camera, in degrees.
-const FOV = 45;
-// Focused panel's bounding box in world units, with breathing room. Used to fit
-// the camera distance to the viewport so the content never overflows the edges.
-const CONTENT_WIDTH = 5.2;
-const CONTENT_HEIGHT = 3;
-
-// Camera distance at which a CONTENT_WIDTH x CONTENT_HEIGHT box just fits the
-// given viewport. Narrower / taller viewports push the camera back; wide ones
-// let it move in closer. Keeps the focused panel framed across aspect ratios
-// (the focused panel sits at z=0, so this distance is also its apparent size).
-const fitCameraZ = (viewportWidth, viewportHeight) => {
-  const aspect = viewportWidth / viewportHeight;
-  const halfFov = (FOV * Math.PI) / 180 / 2;
-  const distForHeight = CONTENT_HEIGHT / (2 * Math.tan(halfFov));
-  const distForWidth = CONTENT_WIDTH / (2 * Math.tan(halfFov) * aspect);
-  return Math.max(distForHeight, distForWidth);
-};
-
-// Separate hook to handle resize
-const useResize = () => {
-  const [size, setSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight
-  });
-
-  const handleResize = useCallback(() => {
-    setSize({
-      width: window.innerWidth,
-      height: window.innerHeight
-    });
-  }, []);
-
-  useEffect(() => {
-    // Handle both window resize and orientation change
-    window.addEventListener("resize", handleResize, { passive: true });
-    window.addEventListener("orientationchange", handleResize, { passive: true });
-
-    // Initial size
-    handleResize();
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("orientationchange", handleResize);
-    };
-  }, [handleResize]);
-
-  return size;
-};
-
-// Detect a low-power / mobile device once at mount. Kept stable for the
-// session so the reflector render target and DPR don't thrash on resize or
-// orientation change (device class effectively never changes mid-session).
-const useIsMobile = () => {
-  const [isMobile] = useState(() => {
-    if (
-      typeof navigator !== "undefined" &&
-      /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-    ) {
-      return true;
-    }
-    return typeof window !== "undefined" && window.innerWidth < 640;
-  });
-
-  return isMobile;
-};
-
 // Minimum sustained FPS (rendering the full scene, reflection included) for a
 // device to keep the expensive effects. Below this they're dropped.
 const MIN_FPS_FOR_REFLECTION = 50;
-
-// One-shot capability probe: renders the real scene for a moment, measures the
-// sustained frame rate (after a warm-up to skip shader / reflector-FBO compile
-// spikes), and reports it once so we keep the reflection only on machines that
-// can actually hold it.
-const DeviceBenchmark = ({ onGraded, sampleMs = 800, warmupFrames = 15 }) => {
-  const invalidate = useThree((state) => state.invalidate);
-  const stats = useRef({ warmed: 0, frames: 0, start: 0, done: false });
-
-  useFrame(() => {
-    const s = stats.current;
-    if (s.done) {
-      return;
-    }
-    if (s.warmed < warmupFrames) {
-      s.warmed += 1;
-      invalidate();
-      return;
-    }
-    if (s.start === 0) {
-      s.start = performance.now();
-    }
-    s.frames += 1;
-    const elapsed = performance.now() - s.start;
-    if (elapsed >= sampleMs) {
-      s.done = true;
-      onGraded((s.frames / elapsed) * 1000);
-    } else {
-      invalidate();
-    }
-  });
-
-  return null;
-};
-
-const ProjectPanel = ({ project, index, currentProjectIndex, initialized = () => {} }) => {
-  const distanceFromCurrent = Math.abs(index - currentProjectIndex);
-  const isFocused = currentProjectIndex === index;
-  const invalidate = useThree((state) => state.invalidate);
-
-  const baseX = distanceFromCurrent * 0.8;
-  const baseZ = distanceFromCurrent * -1;
-
-  const { position } = useSpring({
-    position: [
-      isFocused ? 0 : currentProjectIndex < index ? baseX : -10,
-      BASE_Y,
-      isFocused ? 0 : currentProjectIndex < index ? baseZ : 0
-    ],
-    config: {
-      mass: 1.5,
-      tension: 170,
-      friction: 26,
-      clamp: false,
-      velocity: 0
-    },
-    // In demand mode the loop is asleep; request a render on each spring tick
-    // so the slide animation is actually drawn.
-    onChange: () => invalidate()
-  });
-
-  const hasInitialized = useRef(false);
-
-  useEffect(() => {
-    if (!project.imageUrls?.length && !hasInitialized.current) {
-      hasInitialized.current = true;
-      initialized();
-    }
-  }, []);
-
-  return (
-    <animated.group position={position}>
-      <Flex
-        justifyContent="center"
-        alignItems="center"
-        width={5}
-        flexDirection="row-reverse"
-        centerAnchor
-      >
-        {project.imageUrls?.length && (
-          <ImagePlane
-            scaleX={2.5}
-            imageUrls={project.imageUrls}
-            marginRight={0.2}
-            disabled={index !== currentProjectIndex}
-            distanceFromCurrent={distanceFromCurrent}
-            initialized={() => initialized()}
-          />
-        )}
-
-        <ProjectCard
-          project={project}
-          position={[0, 0, 0]}
-          disabled={index !== currentProjectIndex}
-        />
-      </Flex>
-    </animated.group>
-  );
-};
 
 const UnifiedProjectCarousel = ({ projects }) => {
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
