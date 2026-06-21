@@ -117,7 +117,7 @@ const projects = [
       "A crowdfunding platform supporting African development initiatives.",
       "Supported production readiness during a resumed development phase: bug fixes, Stripe/Sumsub integration stabilization, and AWS environment transition."
     ],
-    roles: ["Backend Developer", "Proprietary Framework, Laravel", "Minor contributor"],
+    roles: ["Backend Developer", "Laravel", "Minor contributor"],
     imageUrls: [adrfFoundationA, adrfFoundationB, adrfFoundationC],
     link: "https://www.adrf.app"
   },
@@ -129,7 +129,7 @@ const projects = [
       "A fitness application that matches users with plans according to their fitness goals.",
       "Designed and implemented the backend APIs, database schema, and CMS."
     ],
-    roles: ["Backend Developer", "Proprietary Framework, Laravel", "Co-contributor"],
+    roles: ["Backend Developer", "Laravel", "Co-contributor"],
     imageUrls: [
       betterFitMobileA,
       betterFitMobileB,
@@ -155,7 +155,7 @@ const projects = [
     descriptions: [
       "A tree maintenance platform tracking maintenance frequency, status, and collaborative workflows."
     ],
-    roles: ["Backend Developer", "Proprietary Framework, Laravel", "Minor contributor"],
+    roles: ["Backend Developer", "Laravel", "Minor contributor"],
     imageUrls: [blendedServicesA, blendedServicesB],
     link: "https://www.btree.com.au/"
   },
@@ -166,7 +166,7 @@ const projects = [
       "A job-matching platform where job seekers and employers find each other through a matching algorithm.",
       "Built the Laravel backend API and CMS."
     ],
-    roles: ["Backend Developer", "Proprietary Framework, Laravel", "Co-contributor"],
+    roles: ["Backend Developer", "Laravel", "Co-contributor"],
     imageUrls: [
       lifestylerA,
       lifestylerB,
@@ -190,11 +190,7 @@ const projects = [
       "A safety check-in application where soloists create scheduled alerts that notify their safety circle if they fail to check in.",
       "Designed and implemented the backend: complex check-in scheduling, alert systems, and APIs consumed by an iOS app."
     ],
-    roles: [
-      "Full Stack (Primarily Backend) Developer",
-      "Proprietary Framework, Laravel",
-      "Co-contributor"
-    ],
+    roles: ["Full Stack (Primarily Backend) Developer", "Laravel", "Co-contributor"],
     imageUrls: [
       soloAlertA,
       soloAlertB,
@@ -218,11 +214,7 @@ const projects = [
       "A risk management tool used by schools to assess and mitigate risks in educational programs and excursions.",
       "Implemented responsive UI components from Figma designs and integrated backend APIs."
     ],
-    roles: [
-      "Frontend Developer (Figma Implementation)",
-      "Proprietary Framework, Vue",
-      "Co-contributor"
-    ],
+    roles: ["Frontend Developer (Figma Implementation)", "Vue", "Co-contributor"],
     imageUrls: [
       xcursionA,
       xcursionB,

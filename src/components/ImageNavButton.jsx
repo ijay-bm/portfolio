@@ -100,7 +100,7 @@ export default function ImageNavButton({
         <animated.group scale={containerCollapse.to(collapseScale)}>
           <mesh position={[0, 0, 0.01]}>
             <roundedPlaneGeometry args={[0.2, 0.2, 0.1]} />
-            <animated.meshBasicMaterial color={color} transparent opacity={0.3} />
+            <animated.meshBasicMaterial color={color} transparent opacity={0.6} />
           </mesh>
         </animated.group>
 
