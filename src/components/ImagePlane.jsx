@@ -2,7 +2,7 @@ import { animated } from "@react-spring/three";
 import { shaderMaterial } from "@react-three/drei";
 import { extend, useFrame, useThree } from "@react-three/fiber";
 import { Box, Flex } from "@react-three/flex";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import displacementTexture from "../assets/images/displacement.png";
 import fragment from "../assets/shaders/fragment.glsl";
@@ -25,6 +25,35 @@ const TransitionMaterial = shaderMaterial(
 
 extend({ TransitionMaterial });
 
+const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+// Plane size for an image, fitting it to scaleX while capping how tall portrait
+// or non-16:9 shots get.
+const calculateImageScale = (texture, scaleX) => {
+  const imageAspect = texture.image.width / texture.image.height;
+  const targetAspect = 16 / 9;
+  const fixedWidth = scaleX;
+  let calculatedHeight = fixedWidth / imageAspect;
+
+  if (imageAspect < 1) {
+    const maxHeight = fixedWidth * 0.8;
+    if (calculatedHeight > maxHeight) {
+      calculatedHeight = maxHeight;
+      return { x: calculatedHeight * imageAspect, y: calculatedHeight };
+    }
+  }
+
+  if (imageAspect < targetAspect) {
+    const maxHeight = (fixedWidth / targetAspect) * 1.2;
+    if (calculatedHeight > maxHeight) {
+      calculatedHeight = maxHeight;
+      return { x: calculatedHeight * imageAspect, y: calculatedHeight };
+    }
+  }
+
+  return { x: fixedWidth, y: calculatedHeight };
+};
+
 const ImagePlane = ({
   imageUrls,
   transitionDuration = 1000,
@@ -35,7 +64,7 @@ const ImagePlane = ({
   autoPlayInterval = Math.floor(Math.random() * 1000 + 3000),
   initialized = () => {}
 }) => {
-  const { size, invalidate } = useThree();
+  const { invalidate } = useThree();
   const meshRef = useRef();
   const materialRef = useRef();
   // Always holds the latest transition() so the autoplay interval never calls
@@ -43,36 +72,95 @@ const ImagePlane = ({
   const transitionFnRef = useRef(null);
   // Freeze the random interval once instead of re-rolling it on every render.
   const [stableInterval] = useState(() => autoPlayInterval);
-  const [textures, setTextures] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  // The currently shown image's { texture, scale }; drives sizing and the reveal.
+  const [currentEntry, setCurrentEntry] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [scales, setScales] = useState([]);
-  const transitionRef = useRef({
-    progress: 0,
-    nextIndex: 0,
-    direction: 1,
-    active: false
-  });
+  const transitionRef = useRef({ active: false });
   const [isInitialized, setIsInitialized] = useState(false);
   const [dispTexture, setDispTexture] = useState(null);
   // Bumped on manual navigation to restart the autoplay countdown so it doesn't
   // fire again immediately after the user clicks.
   const [autoPlayResetToken, setAutoPlayResetToken] = useState(0);
 
+  // Lazy texture loading: only the images this panel actually shows get loaded.
+  const cacheRef = useRef(new Map());
+  const loaderRef = useRef();
+  if (!loaderRef.current) {
+    loaderRef.current = new THREE.TextureLoader();
+  }
+  const hasReportedInit = useRef(false);
+  const pendingRef = useRef(false);
+
+  const getEntry = useCallback(
+    (url) => {
+      const cache = cacheRef.current;
+      const cached = cache.get(url);
+      if (cached) {
+        return Promise.resolve(cached);
+      }
+      return new Promise((resolve) => {
+        loaderRef.current.load(
+          url,
+          (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            const entry = { texture, scale: calculateImageScale(texture, scaleX) };
+            cache.set(url, entry);
+            resolve(entry);
+          },
+          undefined,
+          () => resolve(null)
+        );
+      });
+    },
+    [scaleX]
+  );
+
+  // Load the displacement texture once.
   useEffect(() => {
-    if (materialRef.current && textures.length && dispTexture) {
-      materialRef.current.currentTexture = textures[0];
-      materialRef.current.nextTexture = textures[0];
-      materialRef.current.disp = dispTexture;
-      materialRef.current.resolution.set(size.width, size.height);
+    loaderRef.current.load(displacementTexture, (loadedDisp) => {
+      setDispTexture(loadedDisp);
+      if (materialRef.current) {
+        materialRef.current.disp = loadedDisp;
+      }
+    });
+  }, []);
+
+  // Load + show the current image (lazily), unless a transition is running.
+  useEffect(() => {
+    let cancelled = false;
+    getEntry(imageUrls[Math.min(currentIndex, imageUrls.length - 1)]).then((entry) => {
+      if (cancelled || !entry) {
+        return;
+      }
+      setCurrentEntry(entry);
+      if (materialRef.current && !transitionRef.current.active) {
+        materialRef.current.disp = dispTexture;
+        materialRef.current.currentTexture = entry.texture;
+        materialRef.current.nextTexture = entry.texture;
+        materialRef.current.progress = 1.0;
+        invalidate();
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [imageUrls, currentIndex, getEntry, dispTexture, invalidate]);
+
+  // Report ready once the first image + displacement are loaded, so the carousel
+  // can reveal without waiting for every image of every project.
+  useEffect(() => {
+    if (currentEntry && dispTexture && !hasReportedInit.current) {
+      hasReportedInit.current = true;
       setIsInitialized(true);
       initialized();
     }
-  }, [textures, dispTexture, size.width, size.height]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentEntry, dispTexture]);
 
   useEffect(() => {
     if (!isInitialized || disabled || !autoPlay) {
-      return;
+      return undefined;
     }
     const autoPlayTimer = setInterval(() => {
       transitionFnRef.current?.(1);
@@ -83,97 +171,33 @@ const ImagePlane = ({
     };
   }, [autoPlay, stableInterval, isInitialized, disabled, autoPlayResetToken]);
 
-  // Updated calculateImageScale to handle various aspect ratios
-  const calculateImageScale = (texture) => {
-    const imageAspect = texture.image.width / texture.image.height;
-    const targetAspect = 16 / 9; // Target aspect ratio (16:9)
-
-    // Set a fixed width for consistency
-    const fixedWidth = scaleX;
-
-    // Calculate height based on image aspect ratio
-    let calculatedHeight = fixedWidth / imageAspect;
-
-    // For portrait images (phone screenshots, etc)
-    if (imageAspect < 1) {
-      // Cap the height and adjust width to maintain aspect ratio
-      const maxHeight = fixedWidth * 0.8; // Cap height at 80% of width
-
-      if (calculatedHeight > maxHeight) {
-        calculatedHeight = maxHeight;
-        const cappedWidth = calculatedHeight * imageAspect;
-        return { x: cappedWidth, y: calculatedHeight };
-      }
-    }
-
-    // For landscape images that aren't 16:9
-    // If image is taller than 16:9 would be at this width
-    if (imageAspect < targetAspect) {
-      // Allow some flexibility, but ensure it's not too tall
-      const maxHeight = (fixedWidth / targetAspect) * 1.2;
-
-      if (calculatedHeight > maxHeight) {
-        calculatedHeight = maxHeight;
-        const cappedWidth = calculatedHeight * imageAspect;
-        return { x: cappedWidth, y: calculatedHeight };
-      }
-    }
-
-    return { x: fixedWidth, y: calculatedHeight };
-  };
-
-  // Load textures
-  useEffect(() => {
-    const textureLoader = new THREE.TextureLoader();
-
-    // Load displacement texture
-    textureLoader.load(displacementTexture, (loadedDisp) => {
-      setDispTexture(loadedDisp);
-    });
-
-    if (!imageUrls.length) {
+  const transition = (direction) => {
+    if (pendingRef.current || transitionRef.current.active || imageUrls.length < 2) {
       return;
     }
+    pendingRef.current = true;
+    const nextIndex = (currentIndex + direction + imageUrls.length) % imageUrls.length;
 
-    // Load image textures
-    Promise.all(
-      imageUrls.map(
-        (url) =>
-          new Promise((resolve) => {
-            textureLoader.load(url, (loadedTexture) => {
-              loadedTexture.colorSpace = THREE.SRGBColorSpace;
-              resolve(loadedTexture);
-            });
-          })
-      )
-    ).then((loadedTextures) => {
-      setTextures(loadedTextures);
-      const newScales = loadedTextures.map(calculateImageScale);
-      setScales(newScales);
-    });
-  }, [imageUrls]);
-
-  const transition = (direction) => {
-    if (isTransitioning || textures.length < 2) return;
-
-    const nextIndex = (currentIndex + direction + textures.length) % textures.length;
-
-    transitionRef.current = {
-      progress: 0,
-      nextIndex,
-      direction,
-      active: true,
-      startTime: Date.now()
-    };
-
-    if (materialRef.current) {
-      materialRef.current.currentTexture = textures[currentIndex];
-      materialRef.current.nextTexture = textures[nextIndex];
+    // Load the target image on demand, then start the animation.
+    getEntry(imageUrls[nextIndex]).then((nextEntry) => {
+      pendingRef.current = false;
+      if (!nextEntry || !materialRef.current || !currentEntry) {
+        return;
+      }
+      transitionRef.current = {
+        active: true,
+        nextIndex,
+        direction,
+        startTime: Date.now(),
+        nextEntry
+      };
+      materialRef.current.currentTexture = currentEntry.texture;
+      materialRef.current.nextTexture = nextEntry.texture;
       materialRef.current.direction = direction;
       materialRef.current.progress = 0;
-    }
-
-    setIsTransitioning(true);
+      setIsTransitioning(true);
+      invalidate();
+    });
   };
 
   // Keep the ref pointing at the freshest transition() every render so the
@@ -197,55 +221,49 @@ const ImagePlane = ({
     const rawProgress = Math.min(elapsed / transitionDuration, 1);
     const progress = easeInOutCubic(rawProgress);
 
-    // Update material uniforms directly
     materialRef.current.progress = progress;
 
-    // Interpolate scales
-    if (meshRef.current && scales.length > 0) {
-      const currentScale = scales[currentIndex];
-      const nextScale = scales[tr.nextIndex];
-      meshRef.current.scale.x = currentScale.x + (nextScale.x - currentScale.x) * progress;
-      meshRef.current.scale.y = currentScale.y + (nextScale.y - currentScale.y) * progress;
+    // Interpolate the plane scale between the two images.
+    if (meshRef.current && currentEntry && tr.nextEntry) {
+      const a = currentEntry.scale;
+      const b = tr.nextEntry.scale;
+      meshRef.current.scale.x = a.x + (b.x - a.x) * progress;
+      meshRef.current.scale.y = a.y + (b.y - a.y) * progress;
     }
 
     if (rawProgress >= 1) {
-      setCurrentIndex(tr.nextIndex);
-      setIsTransitioning(false);
       tr.active = false;
       // Keep rendering ~0.8s so the buttons' reappear animation is drawn.
       tr.cooldownUntil = Date.now() + 800;
 
-      // Update final state
-      materialRef.current.currentTexture = textures[tr.nextIndex];
-      materialRef.current.nextTexture = textures[tr.nextIndex];
+      materialRef.current.currentTexture = tr.nextEntry.texture;
+      materialRef.current.nextTexture = tr.nextEntry.texture;
       materialRef.current.progress = 1.0;
+
+      setCurrentEntry(tr.nextEntry);
+      setCurrentIndex(tr.nextIndex);
+      setIsTransitioning(false);
     }
 
     invalidate();
   });
 
-  // useImperativeHandle(ref, () => ({
-  //   transition
-  // }));
-
-  if (textures.length === 0 || scales.length === 0) return null;
+  if (!currentEntry) return null;
 
   return (
     <Box
       position={[0, 0, 0]}
       width={scaleX}
-      height={scales[currentIndex].y}
+      height={currentEntry.scale.y}
       marginRight={marginRight}
       centerAnchor
     >
       <Box width={scaleX}>
-        <animated.mesh ref={meshRef} scale={[scales[currentIndex].x, scales[currentIndex].y, 1]}>
+        <animated.mesh ref={meshRef} scale={[currentEntry.scale.x, currentEntry.scale.y, 1]}>
           <planeGeometry args={[1, 1]} />
           <transitionMaterial
             ref={materialRef}
             transparent
-            currentTexture={textures[currentIndex]}
-            nextTexture={textures[currentIndex]}
             intensity={0.7}
             progress={1.0}
             direction={1.0}
@@ -256,7 +274,7 @@ const ImagePlane = ({
       <Flex
         position={[0, 0, 0.1]}
         width={scaleX}
-        height={scales[currentIndex].y}
+        height={currentEntry.scale.y}
         flexDir={"row"}
         justify="space-between"
         align="center"
@@ -294,10 +312,6 @@ const ImagePlane = ({
       </Flex>
     </Box>
   );
-};
-
-const easeInOutCubic = (t) => {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 };
 
 export default ImagePlane;
