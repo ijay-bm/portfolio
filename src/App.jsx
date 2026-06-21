@@ -119,22 +119,27 @@ const projects = [
       "Supported production readiness during a resumed development phase: bug fixes, Stripe/Sumsub integration stabilization, and AWS environment transition.",
     role: "Backend Developer",
     tech: ["Laravel", "Stripe", "Sumsub", "Filament", "AWS"],
-    // highlights: [],
+    stats: { active: "Feb 2026" },
+    highlights: [
+      "Hardened the Filament admin (resources and exports) and validation rules during the production-readiness push."
+    ],
     imageUrls: [adrfFoundationA, adrfFoundationB, adrfFoundationC],
     link: "https://www.adrf.app"
   },
   {
     title: "Better Fit",
-    subtitle: "Oct 2025 - Jan 2026",
+    subtitle: "Oct 2025 - Feb 2026",
     tier: "flagship",
     summary: "A fitness app that matches users with plans based on their fitness goals.",
     notes: "Owned the backend: REST APIs, database schema, and the Filament CMS.",
     role: "Backend Developer",
-    tech: ["Laravel", "Filament", "AWS", "REST API"],
-    // highlights: [
-    //   "Modeled the goal-to-plan matching domain and designed the database schema behind it.",
-    //   "Delivered the REST API consumed by the mobile client and a Filament CMS for managing plans and content."
-    // ],
+    tech: ["Laravel", "Filament", "REST API", "k6", "Bruno", "AWS"],
+    stats: { active: "Oct 2025 – Feb 2026" },
+    highlights: [
+      "Built the domain as a modular monolith — feature work in a self-contained FitnessModule over a shared AuthModule.",
+      "Load-tested the API with k6.",
+      "Maintained a Bruno API spec as the contract for the mobile clients."
+    ],
     imageUrls: [
       betterFitMobileA,
       betterFitMobileB,
@@ -162,8 +167,11 @@ const projects = [
       "A tree maintenance platform tracking maintenance frequency, status, and collaborative workflows.",
     notes: "Supported development of new features and updates to existing features.",
     role: "Backend Developer",
-    // highlights: [],
-    tech: ["Laravel"],
+    tech: ["Laravel", "MySQL"],
+    stats: { active: "Aug – Sep 2025" },
+    highlights: [
+      "Added scheduled console commands, API resources, and migrations during a short, focused stint."
+    ],
     imageUrls: [blendedServicesA, blendedServicesB],
     link: "https://www.btree.com.au/"
   },
@@ -173,10 +181,16 @@ const projects = [
     tier: "production",
     summary:
       "A job-matching platform where job seekers and employers find each other through a matching algorithm.",
-    notes: "Built the Laravel backend API and CMS.",
+    notes: "Built the Laravel backend API and a Filament admin CMS.",
     role: "Backend Developer",
-    // highlights: [],
-    tech: ["Laravel", "Filament", "AWS", "REST API"],
+    tech: ["Laravel", "Filament", "REST API", "PHPUnit", "Bruno", "AWS"],
+    stats: { active: "Jun – Oct 2025" },
+    highlights: [
+      "Built the REST API plus a Filament admin.",
+      "Test-driven controllers.",
+      "Factored reusable model traits out of the domain models.",
+      "Maintained an extensive Bruno API spec (138 spec touches) as the API contract."
+    ],
     imageUrls: [
       lifestylerA,
       lifestylerB,
@@ -195,18 +209,21 @@ const projects = [
   },
   {
     title: "Solo Alert",
-    subtitle: "Apr 2025 - Aug 2025",
+    subtitle: "Apr 2025 - Oct 2025",
     tier: "flagship",
     summary:
       "A safety check-in app where soloists schedule alerts that notify their safety circle if they fail to check in.",
     notes:
       "Owned the backend: check-in scheduling, alerting, and the APIs consumed by the iOS app.",
     role: "Full-Stack Developer",
-    tech: ["Laravel", "Filament", "AWS", "REST API"],
-    // highlights: [
-    //   "Designed the scheduling logic for recurring check-ins and the alert escalation that notifies a soloist's safety circle on a missed check-in.",
-    //   "Delivered the REST APIs consumed by the iOS app."
-    // ],
+    tech: ["Laravel", "Filament", "REST API", "PHPUnit", "Bruno", "AWS"],
+    stats: { active: "Apr – Oct 2025" },
+    highlights: [
+      "Test-driven backend — feature tests for controllers and jobs shipped with the code; the test suite is the single most-touched part of the repo.",
+      "Built the check-in scheduling and alert escalation as queued, tested jobs over a dedicated service layer.",
+      "Token-based auth via a self-contained AuthModule, consumed by the iOS app.",
+      "Maintained a Bruno API spec as the living contract for the mobile client."
+    ],
     imageUrls: [
       soloAlertA,
       soloAlertB,
@@ -231,10 +248,13 @@ const projects = [
       "A risk management tool used by schools to assess and mitigate risks in educational programs and excursions.",
     notes: "Implemented responsive UI from Figma designs and integrated backend APIs.",
     role: "Frontend Developer",
-    // highlights: [
-    //    "Figma implementation"
-    // ],
     tech: ["Vue", "Nuxt", "TypeScript"],
+    stats: { active: "Dec 2024 – Apr 2025" },
+    highlights: [
+      "Implemented the risk-assessment flows from Figma — the new-assessment builder was the most-active area of the app.",
+      "TypeScript Vue throughout, with shared composables and an auth module.",
+      "Wired the UI to the backend APIs."
+    ],
     imageUrls: [
       xcursionA,
       xcursionB,
@@ -280,11 +300,11 @@ const projects = [
       "A QR code-based Attendance Monitoring System for real-time, token-based attendance tracking.",
     notes: "Sole author across application, database, and infrastructure.",
     role: "Full-Stack Developer & AWS Maintainer",
-    tech: ["Laravel", "Vue", "AWS"],
-    // highlights: [
-    //   "QR/token-based check-ins, validated in real time by a handshake between an overseer and a tutor.",
-    //   "Designed and deployed the full AWS stack end-to-end."
-    // ],
+    tech: ["Laravel", "Vue", "Docker", "AWS"],
+    highlights: [
+      "QR/token-based check-ins, validated in real time by a handshake between an overseer and a tutor.",
+      "Designed and deployed the full stack solo — Dockerized services behind nginx, shipped via AWS CodeDeploy."
+    ],
     imageUrls: [
       chalkboardAralAmsA,
       chalkboardAralAmsB,
@@ -301,25 +321,33 @@ const projects = [
     summary: "An online tutoring marketplace where learners and tutors meet.",
     notes: "Built and maintained payments, geolocation pricing, and AWS deployments over ~3 years.",
     role: "Full-Stack Developer",
-    tech: ["Laravel", "Vue", "Docker", "AWS", "Bitbucket CI/CD"],
-    // highlights: [
-    //   "Solved card fee-shouldering with an iterative bcmath routine that back-computes the gross charge so the business nets a target amount after Xendit's fee and floored VAT (no clean algebraic inverse).",
-    //   "Verified DragonPay postbacks by reconstructing the SHA1 digest — returning 500 on mismatch to trigger their retry, with a scheduled poll as a fallback for missed callbacks.",
-    //   "Localized card pricing by IP via MaxMind GeoLite2 (national vs. international rates), defaulting to PH on lookup failure.",
-    //   "Service-specific exceptions carrying structured data + HTTP status, returned as source-flagged JSON so the frontend knows which integration failed."
-    // ],
+    tech: ["Laravel", "Vue", "MySQL", "Docker", "AWS", "Bitbucket CI/CD"],
+    stats: { active: "Oct 2022 – Aug 2024" },
+    highlights: [
+      "Solved card fee-shouldering with an iterative bcmath routine that back-computes the gross charge so the business nets a target amount after Xendit's fee and floored VAT (no clean algebraic inverse).",
+      "Verified DragonPay postbacks by reconstructing the SHA1 digest — returning 500 on mismatch to trigger their retry, with a scheduled poll as a fallback for missed callbacks.",
+      "Localized card pricing by IP via MaxMind GeoLite2 (national vs. international rates), defaulting to PH on lookup failure.",
+      "Ran session lifecycle, expiries, and reminders as scheduled commands and queued jobs.",
+      "Service-specific exceptions carrying structured data + HTTP status, returned as source-flagged JSON so the frontend knows which integration failed.",
+      "Led a modernization of the legacy stack — Laravel 6 → 10 (PHP 8.1) with a Vue 3 rebuild — recreating feature parity from a largely undocumented codebase. A substantial upgrade that didn't reach production before a business pivot."
+    ],
     imageUrls: [chalkboardA, chalkboardB, chalkboardC, chalkboardD, chalkboardE, chalkboardF]
   },
   {
     title: "Chalkboard Manager",
-    subtitle: "Q4 2021 — Q3 2024",
+    subtitle: "Q2 2021 — Q2 2024",
     tier: "production",
     summary:
       "A back-office web app that manages the customer-facing Chalkboard tutoring marketplace.",
-    notes: "Sole developer and AWS maintainer across the app's lifetime.",
+    notes: "Primary developer and AWS maintainer across the app's lifetime.",
     role: "Full-Stack Developer & AWS Maintainer",
-    // highlights: [],
-    tech: ["Laravel", "Vue", "AWS"],
+    tech: ["Laravel", "Vue", "Vuex", "MySQL", "AWS"],
+    stats: { active: "Jun 2021 – May 2024" },
+    highlights: [
+      "Modular Laravel back-office (nwidart modules) covering schedule management and tutor operations.",
+      "Vue 2 + Vuex single-page front-end — a shared component library backed by per-module stores.",
+      "Maintained the AWS deployment across the app's lifetime."
+    ],
     imageUrls: [chalkboardManagerA, chalkboardManagerB, chalkboardManagerC, chalkboardManagerD]
   },
   {
@@ -328,6 +356,7 @@ const projects = [
     tier: "practice",
     summary: "A small-medium e-commerce project from the Complete React Developer course.",
     tech: ["React", "React Router v7", "TypeScript", "Google Firebase"],
+    stats: { active: "Oct 2025" },
     imageUrls: [crwnClothingA, crwnClothingB, crwnClothingC],
     link: "https://warm-selkie-a6bbd8.netlify.app/"
   },
@@ -337,6 +366,7 @@ const projects = [
     tier: "practice",
     summary: "A sample landing page for an imaginary org called Spacefarers.",
     tech: ["HTML", "SCSS", "CSS 3D", "JavaScript"],
+    stats: { active: "Aug 2022" },
     imageUrls: [spacefarersA, spacefarersB, spacefarersC, spacefarersD, spacefarersE],
     link: "https://ijay-bm.github.io/landing-page/"
   },
@@ -346,9 +376,28 @@ const projects = [
     tier: "practice",
     summary: "A sample personal page for an imaginary person.",
     tech: ["HTML", "SCSS"],
+    stats: { active: "Apr 2021 – Oct 2024" },
     imageUrls: [personalPageA, personalPageB],
     link: "https://ijay-bm.github.io/personal-page-01/"
   },
+
+  // {
+  //   title: "IP Management",
+  //   subtitle: "Apr 2026",
+  //   tier: "personal",
+  //   summary: "A microservices IP-address management system.",
+  //   notes: "Personal project exploring a microservices architecture end to end.",
+  //   role: "Full-Stack Developer",
+  //   tech: ["Laravel", "Vue 3", "Vuetify", "Node/Express", "TypeScript", "Docker", "JWT", "Microservices"],
+  //   stats: { active: "Apr 2026" },
+  //   highlights: [
+  //     "Four services: a thin Node/Express API gateway (reverse proxy) fronting separate Auth and IP-Management Laravel apps and a Vue 3 / Vuetify SPA.",
+  //     "Stateless cross-service auth with asymmetric JWT (RS256, tymon/jwt-auth): the Auth service alone signs tokens with the private key, while the IP-Management service holds only the public key — so it verifies a request locally without calling auth, and a downstream service can never mint its own tokens.",
+  //     "Short-lived 15-minute access tokens with refresh tokens, and role gating via middleware (super-admin)."
+  //   ],
+  //   link: "https://github.com/ijay-bm/ip-mgmt"
+  // },
+
   {
     title: "Resume",
     type: "resume",

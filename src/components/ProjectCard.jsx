@@ -139,8 +139,10 @@ const ProjectCard = ({ project, position = [0, 0, 0], disabled = false }) => {
       centerAnchor
     >
       <animated.mesh position={[position[0], 0, -0.01]}>
-        {/* <roundedPlaneGeometry args={[cardWidth + 0.2, cardHeight + 0.2, 0.1]} /> */}
-        <planeGeometry args={[cardWidth + 0.2, cardHeight + 0.2]} />
+        {/* Width tracks the Flex's fixed `width` (content is left-anchored to it),
+            not the measured content width — otherwise sparse cards like the
+            text-only Resume slide get a narrow panel the content spills out of. */}
+        <planeGeometry args={[width + 0.2, cardHeight + 0.2]} />
         <animated.meshBasicMaterial color={color} opacity={0.95} transparent />
       </animated.mesh>
 
