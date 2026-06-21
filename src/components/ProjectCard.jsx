@@ -92,8 +92,8 @@ const Chip = ({ text, accent = false }) => {
 };
 
 const ProjectCard = ({ project, position = [0, 0, 0], disabled = false }) => {
-  const width = 1.5;
-  const padding = 0.1;
+  const width = 1.1;
+  const padding = 0.04;
   const maxTextWidth = width - padding * 2;
 
   const [cardWidth, setCardWidth] = useState(0);
