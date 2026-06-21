@@ -137,6 +137,7 @@ const projects = [
     stats: { active: "Oct 2025 – Feb 2026" },
     highlights: [
       "Built the domain as a modular monolith — feature work in a self-contained FitnessModule over a shared AuthModule.",
+      "Phone-number auth: SMS one-time passwords exchanged for a Sanctum API token.",
       "Load-tested the API with k6.",
       "Maintained a Bruno API spec as the contract for the mobile clients."
     ],
@@ -252,8 +253,9 @@ const projects = [
     stats: { active: "Dec 2024 – Apr 2025" },
     highlights: [
       "Implemented the risk-assessment flows from Figma — the new-assessment builder was the most-active area of the app.",
-      "TypeScript Vue throughout, with shared composables and an auth module.",
-      "Wired the UI to the backend APIs."
+      "TypeScript Vue throughout, with shared composables.",
+      "Wired the UI to the backend APIs.",
+      "Implemented the SSO sign-in flow — an OAuth2/OIDC authorization-code redirect to an external IdP."
     ],
     imageUrls: [
       xcursionA,
