@@ -113,23 +113,28 @@ const projects = [
   {
     title: "ADRF Foundation",
     subtitle: "Feb 2026 - March 2026",
-    descriptions: [
-      "A crowdfunding platform supporting African development initiatives.",
-      "Supported production readiness during a resumed development phase: bug fixes, Stripe/Sumsub integration stabilization, and AWS environment transition."
-    ],
-    roles: ["Backend Developer", "Laravel", "Minor contributor"],
+    tier: "production",
+    summary: "A crowdfunding platform supporting African development initiatives.",
+    notes:
+      "Supported production readiness during a resumed development phase: bug fixes, Stripe/Sumsub integration stabilization, and AWS environment transition.",
+    role: "Backend Developer",
+    tech: ["Laravel", "Stripe", "Sumsub", "Filament", "AWS"],
+    // highlights: [],
     imageUrls: [adrfFoundationA, adrfFoundationB, adrfFoundationC],
     link: "https://www.adrf.app"
   },
-
   {
     title: "Better Fit",
     subtitle: "Oct 2025 - Jan 2026",
-    descriptions: [
-      "A fitness application that matches users with plans according to their fitness goals.",
-      "Designed and implemented the backend APIs, database schema, and CMS."
-    ],
-    roles: ["Backend Developer", "Laravel", "Co-contributor"],
+    tier: "flagship",
+    summary: "A fitness app that matches users with plans based on their fitness goals.",
+    notes: "Owned the backend: REST APIs, database schema, and the Filament CMS.",
+    role: "Backend Developer",
+    tech: ["Laravel", "Filament", "AWS", "REST API"],
+    // highlights: [
+    //   "Modeled the goal-to-plan matching domain and designed the database schema behind it.",
+    //   "Delivered the REST API consumed by the mobile client and a Filament CMS for managing plans and content."
+    // ],
     imageUrls: [
       betterFitMobileA,
       betterFitMobileB,
@@ -152,21 +157,26 @@ const projects = [
   {
     title: "Blended Services",
     subtitle: "Aug 2025 - Sep 2025",
-    descriptions: [
-      "A tree maintenance platform tracking maintenance frequency, status, and collaborative workflows."
-    ],
-    roles: ["Backend Developer", "Laravel", "Minor contributor"],
+    tier: "production",
+    summary:
+      "A tree maintenance platform tracking maintenance frequency, status, and collaborative workflows.",
+    notes: "Supported development of new features and updates to existing features.",
+    role: "Backend Developer",
+    // highlights: [],
+    tech: ["Laravel"],
     imageUrls: [blendedServicesA, blendedServicesB],
     link: "https://www.btree.com.au/"
   },
   {
     title: "LifeStyler",
     subtitle: "Jun 2025 - Oct 2025",
-    descriptions: [
+    tier: "production",
+    summary:
       "A job-matching platform where job seekers and employers find each other through a matching algorithm.",
-      "Built the Laravel backend API and CMS."
-    ],
-    roles: ["Backend Developer", "Laravel", "Co-contributor"],
+    notes: "Built the Laravel backend API and CMS.",
+    role: "Backend Developer",
+    // highlights: [],
+    tech: ["Laravel", "Filament", "AWS", "REST API"],
     imageUrls: [
       lifestylerA,
       lifestylerB,
@@ -186,11 +196,17 @@ const projects = [
   {
     title: "Solo Alert",
     subtitle: "Apr 2025 - Aug 2025",
-    descriptions: [
-      "A safety check-in application where soloists create scheduled alerts that notify their safety circle if they fail to check in.",
-      "Designed and implemented the backend: complex check-in scheduling, alert systems, and APIs consumed by an iOS app."
-    ],
-    roles: ["Full Stack (Primarily Backend) Developer", "Laravel", "Co-contributor"],
+    tier: "flagship",
+    summary:
+      "A safety check-in app where soloists schedule alerts that notify their safety circle if they fail to check in.",
+    notes:
+      "Owned the backend: check-in scheduling, alerting, and the APIs consumed by the iOS app.",
+    role: "Full-Stack Developer",
+    tech: ["Laravel", "Filament", "AWS", "REST API"],
+    // highlights: [
+    //   "Designed the scheduling logic for recurring check-ins and the alert escalation that notifies a soloist's safety circle on a missed check-in.",
+    //   "Delivered the REST APIs consumed by the iOS app."
+    // ],
     imageUrls: [
       soloAlertA,
       soloAlertB,
@@ -210,11 +226,15 @@ const projects = [
   {
     title: "Xcursion",
     subtitle: "Dec 2024 - Apr 2025",
-    descriptions: [
+    tier: "production",
+    summary:
       "A risk management tool used by schools to assess and mitigate risks in educational programs and excursions.",
-      "Implemented responsive UI components from Figma designs and integrated backend APIs."
-    ],
-    roles: ["Frontend Developer (Figma Implementation)", "Vue", "Co-contributor"],
+    notes: "Implemented responsive UI from Figma designs and integrated backend APIs.",
+    role: "Frontend Developer",
+    // highlights: [
+    //    "Figma implementation"
+    // ],
+    tech: ["Vue", "Nuxt", "TypeScript"],
     imageUrls: [
       xcursionA,
       xcursionB,
@@ -237,10 +257,12 @@ const projects = [
   {
     title: "Chalkboard Aral",
     subtitle: "Q3 2024",
-    descriptions: [
-      "A landing page and information hub for all of Chalkboard's ARAL initiatives. Setup AWS tools and deployed the WordPress install."
-    ],
-    roles: ["AWS Infrastructure Maintainer", "Minor Contributor"],
+    tier: "production",
+    summary: "A landing page and information hub for all of Chalkboard's ARAL initiatives.",
+    notes: "Set up the AWS infrastructure and deployed the WordPress install.",
+    role: "AWS Infrastructure Maintainer",
+    // highlights: [],
+    tech: ["WordPress", "AWS"],
     imageUrls: [
       chalkboardAralA,
       chalkboardAralB,
@@ -253,17 +275,16 @@ const projects = [
   {
     title: "Chalkboard Aral AMS",
     subtitle: "Q2 2024 — Q3 2024",
-    descriptions: [
-      "A QR code-based Attendance Monitoring System (AMS) for real-time token-based attendance tracking.",
-      "Utilizes handshakes between an overseer and a tutor to monitor attendance.",
-      "Built end-to-end: application, database, and AWS infrastructure."
-    ],
-    roles: [
-      "Full Stack Developer",
-      "AWS Infrastructure Architect",
-      "Laravel, Vue",
-      "Sole Contributor"
-    ],
+    tier: "flagship",
+    summary:
+      "A QR code-based Attendance Monitoring System for real-time, token-based attendance tracking.",
+    notes: "Sole author across application, database, and infrastructure.",
+    role: "Full-Stack Developer & AWS Maintainer",
+    tech: ["Laravel", "Vue", "AWS"],
+    // highlights: [
+    //   "QR/token-based check-ins, validated in real time by a handshake between an overseer and a tutor.",
+    //   "Designed and deployed the full AWS stack end-to-end."
+    // ],
     imageUrls: [
       chalkboardAralAmsA,
       chalkboardAralAmsB,
@@ -276,58 +297,62 @@ const projects = [
   {
     title: "Chalkboard",
     subtitle: "Q4 2021 — Q3 2024",
-    descriptions: [
-      "An online tutoring marketplace where learners and tutors meet.",
-      "Integrated card payments (Xendit), e-wallet/bank payments (DragonPay), and geolocation-based localized pricing (MaxMind)."
-    ],
-    roles: [
-      "Full Stack Developer",
-      "Features Development",
-      "Deployments",
-      "Laravel, Vue",
-      "Co-contributor"
-    ],
+    tier: "flagship",
+    summary: "An online tutoring marketplace where learners and tutors meet.",
+    notes: "Built and maintained payments, geolocation pricing, and AWS deployments over ~3 years.",
+    role: "Full-Stack Developer",
+    tech: ["Laravel", "Vue", "Docker", "AWS", "Bitbucket CI/CD"],
+    // highlights: [
+    //   "Solved card fee-shouldering with an iterative bcmath routine that back-computes the gross charge so the business nets a target amount after Xendit's fee and floored VAT (no clean algebraic inverse).",
+    //   "Verified DragonPay postbacks by reconstructing the SHA1 digest — returning 500 on mismatch to trigger their retry, with a scheduled poll as a fallback for missed callbacks.",
+    //   "Localized card pricing by IP via MaxMind GeoLite2 (national vs. international rates), defaulting to PH on lookup failure.",
+    //   "Service-specific exceptions carrying structured data + HTTP status, returned as source-flagged JSON so the frontend knows which integration failed."
+    // ],
     imageUrls: [chalkboardA, chalkboardB, chalkboardC, chalkboardD, chalkboardE, chalkboardF]
   },
   {
     title: "Chalkboard Manager",
     subtitle: "Q4 2021 — Q3 2024",
-    descriptions: [
-      "A back-office web app that manages the customer-facing Chalkboard tutoring marketplace."
-    ],
-    roles: ["Full Stack Developer", "AWS Infrastructure Maintainer", "Sole Contributor"],
+    tier: "production",
+    summary:
+      "A back-office web app that manages the customer-facing Chalkboard tutoring marketplace.",
+    notes: "Sole developer and AWS maintainer across the app's lifetime.",
+    role: "Full-Stack Developer & AWS Maintainer",
+    // highlights: [],
+    tech: ["Laravel", "Vue", "AWS"],
     imageUrls: [chalkboardManagerA, chalkboardManagerB, chalkboardManagerC, chalkboardManagerD]
   },
   {
     title: "Crwn Clothing",
     subtitle: "Oct 2025",
-    descriptions: [
-      "A small-medium e-commerce project built with React and React Router v7, from the Complete React Developer course."
-    ],
-    roles: ["Sole Contributor"],
+    tier: "practice",
+    summary: "A small-medium e-commerce project from the Complete React Developer course.",
+    tech: ["React", "React Router v7", "TypeScript", "Google Firebase"],
     imageUrls: [crwnClothingA, crwnClothingB, crwnClothingC],
     link: "https://warm-selkie-a6bbd8.netlify.app/"
   },
   {
     title: "Spacefarers",
     subtitle: "Q3 2022",
-    descriptions: ["A sample landing page for an imaginary org called Spacefarers."],
-    roles: ["Sole Contributor"],
+    tier: "practice",
+    summary: "A sample landing page for an imaginary org called Spacefarers.",
+    tech: ["HTML", "SCSS", "CSS 3D", "JavaScript"],
     imageUrls: [spacefarersA, spacefarersB, spacefarersC, spacefarersD, spacefarersE],
     link: "https://ijay-bm.github.io/landing-page/"
   },
   {
     title: "Personal Page",
     subtitle: "Q2 2021",
-    descriptions: ["A sample personal page for an imaginary person."],
-    roles: ["Sole Contributor"],
+    tier: "practice",
+    summary: "A sample personal page for an imaginary person.",
+    tech: ["HTML", "SCSS"],
     imageUrls: [personalPageA, personalPageB],
     link: "https://ijay-bm.github.io/personal-page-01/"
   },
   {
     title: "Resume",
     type: "resume",
-    descriptions: ["Like what you've seen? Check out my resume!"],
+    summary: "Like what you've seen? Check out my resume!",
     link: "https://ijay-bm.github.io/resume/"
   }
 ];

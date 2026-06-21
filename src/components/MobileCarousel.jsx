@@ -7,6 +7,11 @@ import ShaderImageStage from "./ShaderImageStage";
 const FADE_MS = 250;
 
 function ProjectDetails({ project, hasImages }) {
+  const [showHighlights, setShowHighlights] = useState(false);
+  const descriptions = [project.summary, project.notes].filter(Boolean);
+  const hasHighlights = project.highlights?.length > 0;
+  const alignClass = hasImages ? "" : "items-center text-center";
+
   return (
     <div
       className={`flex flex-col overflow-y-auto p-6 ${
@@ -15,27 +20,74 @@ function ProjectDetails({ project, hasImages }) {
     >
       {/* my-auto centers the block when it fits, but collapses (no top clip) when
           it overflows, so the title stays reachable and the box scrolls. */}
-      <div className={`my-auto flex flex-col gap-3 ${hasImages ? "" : "items-center text-center"}`}>
+      <div className={`my-auto flex flex-col gap-3 ${alignClass}`}>
         <h2 className="text-3xl font-semibold leading-tight sm:text-4xl">{project.title}</h2>
         {project.subtitle && (
           <p className="text-sm text-white/50 sm:text-base">{project.subtitle}</p>
         )}
 
         <div className="space-y-2 text-[19px] leading-relaxed text-white/80 sm:text-[22px]">
-          {project.descriptions?.map((description, i) => (
+          {descriptions.map((description, i) => (
             <p key={i}>{description}</p>
           ))}
         </div>
 
-        {project.roles?.length > 0 && (
-          <ul className="space-y-1 text-[19px] text-white/80 sm:text-[22px]">
-            {project.roles.map((role, i) => (
-              <li key={i} className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white/60 sm:h-2 sm:w-2" />
-                {role}
+        {(project.role || project.tech?.length > 0) && (
+          <ul className={`flex flex-wrap gap-2 ${hasImages ? "" : "justify-center"}`}>
+            {project.role && (
+              <li className="rounded-full bg-purple-500/30 px-3 py-1 text-sm text-purple-100 backdrop-blur-sm sm:text-base">
+                {project.role}
+              </li>
+            )}
+            {project.tech?.map((tech, i) => (
+              <li
+                key={i}
+                className="rounded-full bg-white/10 px-3 py-1 text-sm text-white/80 backdrop-blur-sm sm:text-base"
+              >
+                {tech}
               </li>
             ))}
           </ul>
+        )}
+
+        {hasHighlights && (
+          <div className={`w-full ${hasImages ? "" : "max-w-xl"}`}>
+            <button
+              type="button"
+              aria-expanded={showHighlights}
+              onClick={() => setShowHighlights((prev) => !prev)}
+              className="flex w-full items-center justify-between gap-2 rounded-md border border-white/15 px-4 py-2 text-[17px] text-white/80 transition hover:bg-white/10 active:scale-[0.99] sm:text-[19px]"
+            >
+              <span>Implementation highlights</span>
+              <svg
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className={`shrink-0 transition-transform duration-200 ${
+                  showHighlights ? "rotate-180" : ""
+                }`}
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+
+            {showHighlights && (
+              <ul className="mt-3 space-y-3 text-left">
+                {project.highlights.map((highlight, i) => (
+                  <li
+                    key={i}
+                    className="flex gap-2 text-[16px] leading-relaxed text-white/70 sm:text-[18px]"
+                  >
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-purple-400" />
+                    <span>{highlight}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
 
         {project.link && (
@@ -110,7 +162,7 @@ export default function MobileCarousel({ projects }) {
             <ShaderImageStage images={project.imageUrls} />
           </div>
         )}
-        <ProjectDetails project={project} hasImages={hasImages} />
+        <ProjectDetails key={projectIndex} project={project} hasImages={hasImages} />
       </div>
 
       <PreviousButton className="absolute bottom-4 left-4 z-10 !w-28" onClick={prevProject} />
