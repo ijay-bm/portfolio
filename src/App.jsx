@@ -356,7 +356,7 @@ const projects = [
     title: "Crwn Clothing",
     subtitle: "Oct 2025",
     tier: "practice",
-    summary: "A small-medium e-commerce project from the Complete React Developer course.",
+    summary: "A small e-commerce project for an imaginary clothing brand.",
     tech: ["React", "React Router v7", "TypeScript", "Google Firebase"],
     stats: { active: "Oct 2025" },
     imageUrls: [crwnClothingA, crwnClothingB, crwnClothingC],

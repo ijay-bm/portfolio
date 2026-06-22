@@ -1,7 +1,15 @@
 import { animated, useSpring } from "@react-spring/three";
 import { Text, useCursor } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
 import { Box, Flex } from "@react-three/flex";
 import { useState } from "react";
+import { FOV } from "../config/camera";
+
+// Responsive text: pixels-per-world-unit at which the card's font is at its base
+// size; below this (smaller windows pull the camera back) the font scales up so
+// it stays legible, capped so it never balloons or overflows the fixed card.
+const REFERENCE_PX_PER_WORLD = 400;
+const FONT_SCALE_MAX = 1.3;
 
 const ButtonMesh = ({ text, onClick, disabled }) => {
   const [hovered, setHovered] = useState(false);
@@ -52,24 +60,26 @@ const CHIP_HEIGHT = 0.084;
 const CHIP_PAD_X = 0.039;
 const CHIP_MARGIN = 0.014;
 
-// troika's default font advances ~0.55em per glyph on average — close enough to
-// size a pill synchronously, which keeps flex layout stable (async text
-// measurement would reflow after the box was already placed).
-const estimateChipWidth = (text) =>
-  Math.max(text.length * CHIP_FONT * 0.55 + CHIP_PAD_X * 2, CHIP_HEIGHT);
-
 // A rounded "pill" chip — the 3D equivalent of the Lite mode's tags. `accent`
 // gives the role a primary (purple) treatment so it reads as the lead of the
 // meta row; tech chips use the translucent white the rest of the card uses.
-const Chip = ({ text, accent = false }) => {
-  const chipWidth = estimateChipWidth(text);
-  const radius = Math.min(CHIP_HEIGHT / 2, chipWidth / 2);
+// `fontScale` grows the pill (text + box) in lockstep with the card's
+// responsive text so chips never shrink on their own.
+const Chip = ({ text, accent = false, fontScale = 1 }) => {
+  const font = CHIP_FONT * fontScale;
+  const height = CHIP_HEIGHT * fontScale;
+  const padX = CHIP_PAD_X * fontScale;
+  const margin = CHIP_MARGIN * fontScale;
+  // troika's default font advances ~0.55em per glyph — enough to size the pill
+  // synchronously (async measuring would reflow after layout).
+  const chipWidth = Math.max(text.length * font * 0.55 + padX * 2, height);
+  const radius = Math.min(height / 2, chipWidth / 2);
 
   return (
-    <Box width={chipWidth} height={CHIP_HEIGHT} margin={CHIP_MARGIN} centerAnchor>
+    <Box width={chipWidth} height={height} margin={margin} centerAnchor>
       <group>
         <mesh position={[0, 0, 0.002]}>
-          <roundedPlaneGeometry args={[chipWidth, CHIP_HEIGHT, radius]} />
+          <roundedPlaneGeometry args={[chipWidth, height, radius]} />
           <meshBasicMaterial
             color={accent ? "#9333ea" : "#ffffff"}
             transparent
@@ -78,7 +88,7 @@ const Chip = ({ text, accent = false }) => {
         </mesh>
         <Text
           position={[0, 0, 0.004]}
-          fontSize={CHIP_FONT}
+          fontSize={font}
           color={accent ? "#ffffff" : "#e6e6e6"}
           anchorX="center"
           anchorY="middle"
@@ -99,6 +109,16 @@ const ProjectCard = ({ project, position = [0, 0, 0], disabled = false }) => {
   const [cardWidth, setCardWidth] = useState(0);
   const [cardHeight, setCardHeight] = useState(0);
   const [hovered, setHovered] = useState(false);
+
+  // Scale the card's text up as it renders smaller on screen. The focused card
+  // sits at z=0, so its apparent size tracks pixels-per-world-unit there; on
+  // smaller windows the camera pulls back and that drops, so the font grows to
+  // stay legible. Clamped to [1, MAX] so it never shrinks below base or overflows
+  // the fixed card width. The OPEN button intentionally opts out of this.
+  const viewportPx = useThree((state) => state.size);
+  const cameraZ = useThree((state) => state.camera.position.z);
+  const pxPerWorld = viewportPx.height / (2 * cameraZ * Math.tan((FOV * Math.PI) / 180 / 2));
+  const fontScale = Math.min(Math.max(REFERENCE_PX_PER_WORLD / pxPerWorld, 1), FONT_SCALE_MAX);
 
   // The 3D card stays terse — implementation highlights are Lite-mode only, to
   // avoid blowing out the text-mesh layout. Show the what/what-I-did lines, the
@@ -157,7 +177,7 @@ const ProjectCard = ({ project, position = [0, 0, 0], disabled = false }) => {
       >
         <Box centerAnchor>
           <Text
-            fontSize={0.044}
+            fontSize={0.044 * fontScale}
             maxWidth={maxTextWidth}
             lineHeight={1.2}
             material-toneMapped={false}
@@ -168,7 +188,7 @@ const ProjectCard = ({ project, position = [0, 0, 0], disabled = false }) => {
 
         <Box centerAnchor marginBottom={0.1}>
           <Text
-            fontSize={0.036}
+            fontSize={0.036 * fontScale}
             maxWidth={maxTextWidth}
             lineHeight={1.2}
             material-toneMapped={false}
@@ -184,7 +204,7 @@ const ProjectCard = ({ project, position = [0, 0, 0], disabled = false }) => {
             marginBottom={index < descriptionLines.length - 1 ? 0.05 : 0}
           >
             <Text
-              fontSize={0.039}
+              fontSize={0.039 * fontScale}
               maxWidth={maxTextWidth}
               lineHeight={1.2}
               material-toneMapped={false}
@@ -203,9 +223,9 @@ const ProjectCard = ({ project, position = [0, 0, 0], disabled = false }) => {
             width={maxTextWidth}
             marginTop={0.05}
           >
-            {project.role && <Chip text={project.role} accent />}
+            {project.role && <Chip text={project.role} accent fontScale={fontScale} />}
             {project.tech?.map((tech, index) => (
-              <Chip key={`tech-${index}`} text={tech} />
+              <Chip key={`tech-${index}`} text={tech} fontScale={fontScale} />
             ))}
           </Box>
         )}
