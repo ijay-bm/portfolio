@@ -7,6 +7,7 @@ import * as THREE from "three";
 import displacementTexture from "../assets/images/displacement.png";
 import fragment from "../assets/shaders/fragment.glsl";
 import vertex from "../assets/shaders/vertex.glsl";
+import ImageLoader from "./ImageLoader";
 import ImageNavButton from "./ImageNavButton";
 
 const TransitionMaterial = shaderMaterial(
@@ -78,6 +79,10 @@ const ImagePlane = ({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const transitionRef = useRef({ active: false });
   const [isInitialized, setIsInitialized] = useState(false);
+  // True once the current image's texture is actually bound to the material —
+  // gates the loader and the panel's "ready" report so we never reveal an
+  // unbound (black) plane.
+  const [imageReady, setImageReady] = useState(false);
   const [dispTexture, setDispTexture] = useState(null);
   // Bumped on manual navigation to restart the autoplay countdown so it doesn't
   // fire again immediately after the user clicks.
@@ -126,7 +131,9 @@ const ImagePlane = ({
     });
   }, []);
 
-  // Load + show the current image (lazily), unless a transition is running.
+  // Resolve the current image lazily. Binding it to the material happens in the
+  // effect below — the mesh (and materialRef) doesn't exist until currentEntry
+  // is set, so we can't touch the material here on the first resolve.
   useEffect(() => {
     let cancelled = false;
     getEntry(imageUrls[Math.min(currentIndex, imageUrls.length - 1)]).then((entry) => {
@@ -134,29 +141,41 @@ const ImagePlane = ({
         return;
       }
       setCurrentEntry(entry);
-      if (materialRef.current && !transitionRef.current.active) {
-        materialRef.current.disp = dispTexture;
-        materialRef.current.currentTexture = entry.texture;
-        materialRef.current.nextTexture = entry.texture;
-        materialRef.current.progress = 1.0;
-        invalidate();
-      }
     });
     return () => {
       cancelled = true;
     };
-  }, [imageUrls, currentIndex, getEntry, dispTexture, invalidate]);
+  }, [imageUrls, currentIndex, getEntry]);
 
-  // Report ready once the first image + displacement are loaded, so the carousel
-  // can reveal without waiting for every image of every project.
+  // Bind the resolved image to the shader material once the mesh is mounted.
+  // This runs after currentEntry triggers the render (so materialRef exists),
+  // fixing the black flash where the texture used to never attach on first load
+  // unless a later effect re-run happened to catch it.
   useEffect(() => {
-    if (currentEntry && dispTexture && !hasReportedInit.current) {
+    const material = materialRef.current;
+    if (!material || !currentEntry || transitionRef.current.active) {
+      return;
+    }
+    if (dispTexture) {
+      material.disp = dispTexture;
+    }
+    material.currentTexture = currentEntry.texture;
+    material.nextTexture = currentEntry.texture;
+    material.progress = 1.0;
+    setImageReady(true);
+    invalidate();
+  }, [currentEntry, dispTexture, invalidate]);
+
+  // Report ready only once the image is actually bound (not merely downloaded),
+  // so the carousel reveals a drawn image rather than a black plane.
+  useEffect(() => {
+    if (imageReady && dispTexture && !hasReportedInit.current) {
       hasReportedInit.current = true;
       setIsInitialized(true);
       initialized();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentEntry, dispTexture]);
+  }, [imageReady, dispTexture]);
 
   useEffect(() => {
     if (!isInitialized || disabled || !autoPlay) {
@@ -248,68 +267,78 @@ const ImagePlane = ({
     invalidate();
   });
 
-  if (!currentEntry) return null;
+  // Reserve the image's footprint even before it resolves (default 16:9), so the
+  // panel doesn't shift sideways when the texture pops in.
+  const planeHeight = currentEntry ? currentEntry.scale.y : scaleX / (16 / 9);
 
   return (
     <Box
       position={[0, 0, 0]}
       width={scaleX}
-      height={currentEntry.scale.y}
+      height={planeHeight}
       marginRight={marginRight}
       centerAnchor
     >
       <Box width={scaleX}>
-        <animated.mesh ref={meshRef} scale={[currentEntry.scale.x, currentEntry.scale.y, 1]}>
-          <planeGeometry args={[1, 1]} />
-          <transitionMaterial
-            ref={materialRef}
-            transparent
-            intensity={0.7}
-            progress={1.0}
-            direction={1.0}
-          />
-        </animated.mesh>
+        {currentEntry && (
+          <animated.mesh ref={meshRef} scale={[currentEntry.scale.x, currentEntry.scale.y, 1]}>
+            <planeGeometry args={[1, 1]} />
+            <transitionMaterial
+              ref={materialRef}
+              transparent
+              intensity={0.7}
+              progress={1.0}
+              direction={1.0}
+            />
+          </animated.mesh>
+        )}
+
+        {!imageReady && (
+          <ImageLoader width={currentEntry ? currentEntry.scale.x : scaleX} height={planeHeight} />
+        )}
       </Box>
 
-      <Flex
-        position={[0, 0, 0.1]}
-        width={scaleX}
-        height={currentEntry.scale.y}
-        flexDir={"row"}
-        justify="space-between"
-        align="center"
-        centerAnchor
-      >
-        <Box width={0.06} centerAnchor>
-          <ImageNavButton
-            direction="next"
-            onClick={() => {
-              if (disabled) {
-                return;
-              }
-              transition(1);
-              setAutoPlayResetToken((t) => t + 1);
-            }}
-            disabled={disabled}
-            transitioning={isTransitioning}
-          />
-        </Box>
+      {currentEntry && (
+        <Flex
+          position={[0, 0, 0.1]}
+          width={scaleX}
+          height={currentEntry.scale.y}
+          flexDir={"row"}
+          justify="space-between"
+          align="center"
+          centerAnchor
+        >
+          <Box width={0.06} centerAnchor>
+            <ImageNavButton
+              direction="next"
+              onClick={() => {
+                if (disabled) {
+                  return;
+                }
+                transition(1);
+                setAutoPlayResetToken((t) => t + 1);
+              }}
+              disabled={disabled}
+              transitioning={isTransitioning}
+            />
+          </Box>
 
-        <Box width={0.06} centerAnchor>
-          <ImageNavButton
-            direction="previous"
-            onClick={() => {
-              if (disabled) {
-                return;
-              }
-              transition(-1);
-              setAutoPlayResetToken((t) => t + 1);
-            }}
-            disabled={disabled}
-            transitioning={isTransitioning}
-          />
-        </Box>
-      </Flex>
+          <Box width={0.06} centerAnchor>
+            <ImageNavButton
+              direction="previous"
+              onClick={() => {
+                if (disabled) {
+                  return;
+                }
+                transition(-1);
+                setAutoPlayResetToken((t) => t + 1);
+              }}
+              disabled={disabled}
+              transitioning={isTransitioning}
+            />
+          </Box>
+        </Flex>
+      )}
     </Box>
   );
 };

@@ -48,12 +48,22 @@ const UnifiedProjectCarousel = ({ projects }) => {
   const reflectorResolution = 512;
   const reflectorBlur = [150, 50];
 
-  const hasFullyInitialized = initializations === projects.length;
-  // const hasFullyInitialized = true;
+  // Every panel's first image is bound (or it has no image). Drives the device
+  // benchmark only — the scene is revealed progressively, not held for this.
+  const allImagesLoaded = initializations === projects.length;
 
-  // Run the benchmark once the scene is fully loaded; keep the reflection while
-  // measuring (so its cost is included) and after, only on "high" devices.
-  const isBenchmarking = hasFullyInitialized && perfTier === "measuring";
+  // Reveal the canvas as soon as it has painted once (next frame), letting each
+  // image stream in behind its own loader instead of holding the whole scene
+  // black until everything is ready.
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setRevealed(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  // Run the benchmark once all images are actually loaded, so it measures the
+  // real per-frame cost (reflection included) rather than the loaders.
+  const isBenchmarking = allImagesLoaded && perfTier === "measuring";
   const showReflection = perfTier !== "low";
 
   const handleGraded = useCallback((avgFps) => {
@@ -99,9 +109,9 @@ const UnifiedProjectCarousel = ({ projects }) => {
     };
   }, []);
 
-  // Keyboard navigation: arrow keys cycle through projects once the scene is ready
+  // Keyboard navigation: arrow keys cycle through projects once the scene is shown
   useEffect(() => {
-    if (!hasFullyInitialized) {
+    if (!revealed) {
       return;
     }
 
@@ -130,18 +140,18 @@ const UnifiedProjectCarousel = ({ projects }) => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [hasFullyInitialized, handlePrevious, handleNext]);
+  }, [revealed, handlePrevious, handleNext]);
 
   return (
     <div className="fixed inset-0 overflow-hidden">
       <div
-        className={`absolute flex h-screen w-screen items-center justify-center duration-500 ${hasFullyInitialized && "opacity-0"}`}
+        className={`absolute flex h-screen w-screen items-center justify-center duration-500 ${revealed && "opacity-0"}`}
       >
         <LoadingDots />
       </div>
 
       <Canvas
-        className={`duration-500 ${!hasFullyInitialized && "opacity-0"}`}
+        className={`duration-500 ${!revealed && "opacity-0"}`}
         key={`${width}-${height}`} // Force canvas recreation on resize
         style={{ width, height }}
         camera={{
@@ -200,12 +210,12 @@ const UnifiedProjectCarousel = ({ projects }) => {
       <PreviousButton
         className="absolute bottom-5 left-5 z-10"
         onClick={handlePrevious}
-        disabled={!hasFullyInitialized}
+        disabled={!revealed}
       />
       <NextButton
         className="absolute bottom-5 right-5 z-10"
         onClick={handleNext}
-        disabled={!hasFullyInitialized}
+        disabled={!revealed}
       />
 
       {isMobile && (
