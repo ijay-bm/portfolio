@@ -397,14 +397,13 @@ const projects = [
   //     "Stateless cross-service auth with asymmetric JWT (RS256, tymon/jwt-auth): the Auth service alone signs tokens with the private key, while the IP-Management service holds only the public key — so it verifies a request locally without calling auth, and a downstream service can never mint its own tokens.",
   //     "Short-lived 15-minute access tokens with refresh tokens, and role gating via middleware (super-admin)."
   //   ],
-  //   link: "https://github.com/ijay-bm/ip-mgmt"
   // },
 
   {
     title: "Resume",
     type: "resume",
     summary: "Like what you've seen? Check out my resume!",
-    link: "https://ijay-bm.github.io/resume/"
+    link: "https://ijay.dev/resume/"
   }
 ];
 

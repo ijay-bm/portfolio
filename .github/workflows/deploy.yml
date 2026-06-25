@@ -17,9 +17,12 @@ jobs:
           npm ci
           npm run build
 
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
         with:
-          folder: dist
-          branch: gh-pages
-          token: ${{ secrets.GITHUB_TOKEN }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+
+      - name: Rsync Files
+        run: |
+          rsync -avz --delete dist/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOSTNAME }}:/var/www/portfolio/
