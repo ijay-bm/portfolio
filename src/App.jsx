@@ -100,6 +100,20 @@ import betterFitApiA from "./assets/images/better-fit/better-fit-api-a.webp";
 import betterFitApiB from "./assets/images/better-fit/better-fit-api-b.webp";
 import betterFitSchemaA from "./assets/images/better-fit/better-fit-schema-a.webp";
 
+import kommunaleExzellenzA from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-a.webp";
+import kommunaleExzellenzB from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-b.webp";
+import kommunaleExzellenzC from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-c.webp";
+import kommunaleExzellenzD from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-d.webp";
+import kommunaleExzellenzE from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-e.webp";
+import kommunaleExzellenzF from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-f.webp";
+import kommunaleExzellenzG from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-g.webp";
+import kommunaleExzellenzH from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-h.webp";
+import kommunaleExzellenzI from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-i.webp";
+import kommunaleExzellenzJ from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-j.webp";
+import kommunaleExzellenzK from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-k.webp";
+import kommunaleExzellenzL from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-l.webp";
+import kommunaleExzellenzM from "./assets/images/kommunale-exzellenz/kommunale-exzellenz-m.webp";
+
 import adrfFoundationA from "./assets/images/adrf-foundation/adrf-foundation-a.webp";
 import adrfFoundationB from "./assets/images/adrf-foundation/adrf-foundation-b.webp";
 import adrfFoundationC from "./assets/images/adrf-foundation/adrf-foundation-c.webp";
@@ -110,6 +124,60 @@ import MobileCarousel from "./components/MobileCarousel";
 import useLayoutMode from "./hooks/useLayoutMode";
 
 const projects = [
+  {
+    title: "Kommunale Exzellenz",
+    subtitle: "Aug 2026 to Oct 2026",
+    tier: "flagship",
+    summary:
+      "A multi-tenant SaaS platform for German municipalities (organization, staff, resource booking, compliance, help), with one PostgreSQL database per tenant.",
+    notes:
+      "Sole engineer, holding every technical role from product planning to deployment, on a legacy modernization: took over a codebase built in its first year with AI assistance, paid down its technical debt, and rewrote or replaced about 90% of it.",
+    role: "Full-Stack Software Engineer (Sole Engineer)",
+    tech: [
+      "PHP 8",
+      "Laravel 12",
+      "Vue.js 3",
+      "TypeScript",
+      "Pinia",
+      "Vite",
+      "PostgreSQL",
+      "Redis",
+      "Docker",
+      "Nginx",
+      "PHPUnit",
+      "Playwright",
+      "CI/CD"
+    ],
+    stats: { active: "Aug 2026 to Oct 2026" },
+    highlights: [
+      "Legacy modernization: migrated a server-rendered Blade monolith of 338 views to two Vue.js 3 and TypeScript single-page applications (SPAs) over a JSON REST API, incrementally while features kept shipping, then restructured it into a monorepo with npm workspaces.",
+      "Multi-tenant SaaS architecture with database-per-tenant isolation (stancl/tenancy): the subdomain selects the municipality's database, tenant provisioning runs on queued jobs (Laravel Horizon, Redis), and each municipality gets a sandbox tenant.",
+      "Role-based access control (RBAC) derived from the organization itself: user → position → task → permission, materialized into Spatie Laravel Permission. Every API endpoint checks its own permission, enforced by an automated test.",
+      "Resource booking engine for rooms, vehicles, and equipment: recurring series, conflict detection, approval workflows, confirmed returns, and iCalendar (ICS) export.",
+      "Automated testing: grew the suite from 5 inherited test files to ~2,600 PHPUnit tests running in parallel against real databases, plus ~840 Playwright end-to-end (E2E) browser tests.",
+      "Internationalization (i18n) and localization in five languages (English, German, French, Dutch, Tagalog), enforced by a test.",
+      "Security and privacy: two-factor authentication (2FA/TOTP), Content Security Policy, rate limiting, and access-checked private file storage, with GDPR compliance as a standing design goal (archiving instead of deletion).",
+      "DevOps: Docker images, a CI/CD pipeline on Forgejo Actions (GitHub Actions compatible), and versioned SSH deployments to staging and production with smoke tests.",
+      "AI-assisted development with Claude Code: ran AI coding agents on documented architecture decisions, coding rules scoped by file path, a catalog of 40 known pitfalls, and dated technical-debt decision logs.",
+      "Worked remotely and directly with the product owner, who represents the pilot municipality: turned requirements, checklists, and mockups into written plans, prepared fixed builds for prospect presentations, and shipped on-premise production installs as Docker images with written runbooks."
+    ],
+    imageUrls: [
+      kommunaleExzellenzA,
+      kommunaleExzellenzB,
+      kommunaleExzellenzC,
+      kommunaleExzellenzD,
+      kommunaleExzellenzE,
+      kommunaleExzellenzF,
+      kommunaleExzellenzG,
+      kommunaleExzellenzH,
+      kommunaleExzellenzI,
+      kommunaleExzellenzJ,
+      kommunaleExzellenzK,
+      kommunaleExzellenzL,
+      kommunaleExzellenzM
+    ],
+    link: "https://kommunale-exzellenz.de"
+  },
   {
     title: "ADRF Foundation",
     subtitle: "Feb 2026 - March 2026",
