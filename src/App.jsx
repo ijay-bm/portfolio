@@ -396,7 +396,7 @@ const projects = [
     highlights: [
       "Solved card fee-shouldering with an iterative bcmath routine that back-computes the gross charge so the business nets a target amount after Xendit's fee and floored VAT (no clean algebraic inverse).",
       "Verified DragonPay postbacks by reconstructing the SHA1 digest — returning 500 on mismatch to trigger their retry, with a scheduled poll as a fallback for missed callbacks.",
-      "Localized card pricing by IP via MaxMind GeoLite2 (national vs. international rates), defaulting to PH on lookup failure.",
+      "Localized prices by IP via MaxMind GeoLite2, so visitors saw PHP or USD before checkout (defaulting to PH on lookup failure), while the card's issuing country set Xendit's national or international fee rate.",
       "Ran session lifecycle, expiries, and reminders as scheduled commands and queued jobs.",
       "Service-specific exceptions carrying structured data + HTTP status, returned as source-flagged JSON so the frontend knows which integration failed.",
       "Led a modernization of the legacy stack — Laravel 6 → 10 (PHP 8.1) with a Vue 3 rebuild — recreating feature parity from a largely undocumented codebase. A substantial upgrade that didn't reach production before a business pivot."
